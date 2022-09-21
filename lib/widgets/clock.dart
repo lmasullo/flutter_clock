@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
+// State
+// import 'package:localstore/localstore.dart';
+import 'package:provider/provider.dart';
+import '../state/applicationState.dart';
+
 class Clock extends StatefulWidget {
   const Clock({super.key});
 
@@ -11,22 +16,26 @@ class Clock extends StatefulWidget {
 }
 
 class _ClockState extends State<Clock> {
-  // @override
-  // void initState() {
-  //   player.setAsset('assets/sounds/thanksgiving.mp4');
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    // final db = Localstore.instance;
+    super.initState();
+  }
 
-  String alarmTime = '10:44';
-
+  // Set variables
   final player = AudioPlayer();
   bool showSnooze = false;
   bool playOnce = false;
 
+  // Function to play alarm sound
   void playAlarm() async {
     if (playOnce == false) {
       print('Playing alarm');
+
+      // Set the audio source
       await player.setAsset('assets/sounds/thanksgiving.mp4');
+      // Play the audio source
       await player.play();
     }
     await Future.delayed(const Duration(seconds: 1));
@@ -36,51 +45,81 @@ class _ClockState extends State<Clock> {
     });
   }
 
-  void reset() async {
-    await player.stop();
-    setState(() {
-      showSnooze = false;
-      playOnce = false;
-    });
-  }
-
-  void snoozeAlarm() async {
+  // Function to snooze the alarm
+  snoozeAlarm(snoozeMinutes) async {
     print('Snoozing alarm');
+
+    // Get the alarm time from the state
+    String? alarmTime =
+        Provider.of<ApplicationState>(context, listen: false).alarmTime;
+
+    // Get setAlarmTime from ApplicationState
+    var setAlarmTime =
+        Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
+
+    // Stop the alarm
     await player.stop();
 
+    // Convert alarmTime to DateTime
+    DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
+
+    // Add 10 minutes to the alarm time
+    setAlarmTime(DateFormat('h:mm').format(
+      alarmTimeAsDateTime.add(
+        Duration(minutes: snoozeMinutes),
+      ),
+    ));
+
     setState(() {
-      // Convert alarmTime to DateTime
-      DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime);
-      // Add 10 minutes to the alarm time
-      alarmTime = DateFormat('h:mm').format(
-        alarmTimeAsDateTime.add(
-          const Duration(minutes: 1),
-        ),
-      );
+      // Set playOnce so the alarm doesn't play again
       playOnce = true;
     });
+
+    // Delay for 1 second
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
+      // Hide the snooze button
       showSnooze = false;
+
+      // Reset playOnce so the alarm can play again
       playOnce = false;
     });
   }
 
   void stopAlarm() async {
     print('Stop alarm');
+
+    // Get setAlarmTime from ApplicationState
+    var setAlarmTime =
+        Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
     await player.stop();
 
     setState(() {
+      // Set the alarm time to 'off'
+      setAlarmTime('off');
+
+      // Set playOnce so the alarm doesn't play again
       playOnce = true;
     });
+    // Delay for 1 second
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
+      // Hide the snooze button
       showSnooze = false;
+
+      // Reset playOnce so the alarm can play again
+      playOnce = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get alarmTime from ApplicationState
+    String? alarmTime = Provider.of<ApplicationState>(context).alarmTime;
+
+    // Get the snooze minutes from ApplicationState
+    int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
+
     int digitColor = 0xFF594747;
 
     return StreamBuilder(
@@ -92,26 +131,33 @@ class _ClockState extends State<Clock> {
 
         return Column(
           children: [
-            // Text(
-            //   alarmTime,
-            //   style: const TextStyle(color: Colors.white),
-            // ),
+            Text(
+              'alarmTime: $alarmTime',
+              style: const TextStyle(color: Colors.white),
+            ),
+
             // ElevatedButton(onPressed: reset, child: const Text('Reset')),
             // if (showSnooze == false) ...[
             //   ElevatedButton(onPressed: playAlarm, child: const Text('Play')),
             // ],
             Text(
               'playOnce: $playOnce',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             if (showSnooze == true) ...[
               ElevatedButton(
-                onPressed: snoozeAlarm,
+                onPressed: () => snoozeAlarm(snoozeMinutes),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   minimumSize: const Size(300, 200),
                 ),
-                child: const Text('Snooze'),
+                child: const Text(
+                  'Snooze',
+                  style: TextStyle(
+                    fontSize: 50,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               const SizedBox(
                 height: 100,
@@ -122,7 +168,13 @@ class _ClockState extends State<Clock> {
                   backgroundColor: Colors.red,
                   minimumSize: const Size(300, 200),
                 ),
-                child: const Text('Stop'),
+                child: const Text(
+                  'Stop',
+                  style: TextStyle(
+                    fontSize: 50,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ] else ...[
               Text(

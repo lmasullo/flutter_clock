@@ -2,11 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:wakelock/wakelock.dart';
 
+// State
+import 'package:provider/provider.dart';
+import '../state/applicationState.dart';
+
+// Pages
+import 'pages/settings.dart';
+import 'pages/test.dart';
+
 // Widgets
 import 'widgets/clock.dart';
 
 void main() {
-  runApp(const MyApp());
+  // runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    // This is enables Provider State Management
+    ChangeNotifierProvider(
+        create: (context) => ApplicationState(),
+        builder: (context, _) => const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +46,7 @@ class MyApp extends StatelessWidget {
     const int clockPrimaryValue = 0xFF3C2727;
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Snooze',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -45,7 +60,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: MaterialColor(clockPrimaryValue, color1),
       ),
-      home: const MyHomePage(title: ''),
+      home: const MyHomePage(title: 'Snooze'),
     );
   }
 }
@@ -86,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -124,9 +139,18 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            // MaterialPageRoute(builder: (context) => const Settings()),
+            MaterialPageRoute(
+                builder: (context) => const Test(
+                      title: 'test',
+                    )),
+          );
+        },
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.settings),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
