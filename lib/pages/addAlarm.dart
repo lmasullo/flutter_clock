@@ -1,6 +1,7 @@
+// ignore_for_file: file_names
 // Dependencies
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 // State
 import 'package:provider/provider.dart';
@@ -14,31 +15,44 @@ class AddAlarm extends StatefulWidget {
 }
 
 class _AddAlarmState extends State<AddAlarm> {
+  // Declare the selectedTime variable
+  TimeOfDay selectedTime = TimeOfDay(hour: 5, minute: 0);
+
   // Declare a text controller.
   TextEditingController alarmController = TextEditingController(text: '');
 
   // Function to save the alarm time
   saveAlarm(BuildContext context) async {
-    print('Save alarm pressed');
+    // Get the alarmTimes from applicationState
+    List<String> alarmTimes =
+        Provider.of<ApplicationState>(context, listen: false).alarmTimes;
 
     // Get the setAlarmTimes from ApplicationState
     var setAlarmTimes =
         Provider.of<ApplicationState>(context, listen: false).setAlarmTimes;
 
-    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-    final SharedPreferences alarms = await _prefs;
-    List<String>? _alarmTimes = alarms.getStringList('time');
-    print('Alarms: $_alarmTimes');
-    // Add alarmController to _alarmTimes
-    _alarmTimes!.add(alarmController.text);
-    // await alarms.setStringList('time', _alarmTimes);
-    // Set the alarmTimes in ApplicationState
-    //print('Alarms: ${_alarmTimes.toString()}');
-    setAlarmTimes(_alarmTimes);
+    // Format the alarmController text to AM/PM
+    String formattedTime = DateFormat.jm().format(
+      DateTime(
+        2021,
+        1,
+        1,
+        selectedTime.hour,
+        selectedTime.minute,
+      ),
+    );
+
+    // Add alarmController to alarmTimes
+    alarmTimes.add(formattedTime);
+
+    // Set the alarmTimes in using the setAlarmTimes function in applicationState
+    setAlarmTimes(alarmTimes);
   }
 
   @override
   Widget build(BuildContext context) {
+    final minutes = selectedTime.minute.toString().padLeft(2, '0');
+    alarmController.text = '${selectedTime.hour}:$minutes';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Alarm'),
@@ -66,6 +80,17 @@ class _AddAlarmState extends State<AddAlarm> {
                     decoration: const InputDecoration(
                       hintText: 'Enter Alarm Time',
                     ),
+                    onTap: () async {
+                      TimeOfDay? newTime = await showTimePicker(
+                        context: context,
+                        initialTime: selectedTime,
+                      );
+
+                      // Set the selectedTime to the newTime
+                      setState(() {
+                        selectedTime = newTime!;
+                      });
+                    },
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter an alarm time';
@@ -75,6 +100,18 @@ class _AddAlarmState extends State<AddAlarm> {
                   ),
                   const SizedBox(height: 20),
 
+                  // ElevatedButton(
+                  //   child: Text("Choose Time"),
+                  //   onPressed: () async {
+                  //     TimeOfDay? newTime = await showTimePicker(
+                  //         context: context, initialTime: selectedTime);
+
+                  //     // Set the selectedTime to the newTime
+                  //     setState(() {
+                  //       selectedTime = newTime!;
+                  //     });
+                  //   },
+                  // ),
                   // A button to add the alarm time
                   ElevatedButton(
                     onPressed: () => {

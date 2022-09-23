@@ -18,8 +18,6 @@ class Clock extends StatefulWidget {
 class _ClockState extends State<Clock> {
   @override
   void initState() {
-    // TODO: implement initState
-    // final db = Localstore.instance;
     super.initState();
   }
 
@@ -30,14 +28,14 @@ class _ClockState extends State<Clock> {
 
   // Function to play alarm sound
   void playAlarm() async {
+    // Only play the alarm once
     if (playOnce == false) {
-      print('Playing alarm');
-
       // Set the audio source
       await player.setAsset('assets/sounds/thanksgiving.mp4');
       // Play the audio source
       await player.play();
     }
+    // Wait 1 second before setting state, had some build errors
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
       playOnce = true;
@@ -47,8 +45,6 @@ class _ClockState extends State<Clock> {
 
   // Function to snooze the alarm
   snoozeAlarm(snoozeMinutes) async {
-    print('Snoozing alarm');
-
     // Get the alarm time from the state
     String? alarmTime =
         Provider.of<ApplicationState>(context, listen: false).alarmTime;
@@ -63,8 +59,8 @@ class _ClockState extends State<Clock> {
     // Convert alarmTime to DateTime
     DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
 
-    // Add 10 minutes to the alarm time
-    setAlarmTime(DateFormat('h:mm').format(
+    // Add the set snooze minutes to the alarm time
+    setAlarmTime(DateFormat('h:mm a').format(
       alarmTimeAsDateTime.add(
         Duration(minutes: snoozeMinutes),
       ),
@@ -87,8 +83,6 @@ class _ClockState extends State<Clock> {
   }
 
   void stopAlarm() async {
-    print('Stop alarm');
-
     // Get setAlarmTime from ApplicationState
     var setAlarmTime =
         Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
@@ -147,12 +141,23 @@ class _ClockState extends State<Clock> {
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Icon(Icons.snooze, color: Color(digitColor)),
                   Text(
                     '$snoozeMinutes mins',
+                    style: TextStyle(
+                      color: Color(digitColor),
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  // A text box that shows how many minutes left until the alarm goes off
+                  Text(
+                    '${DateFormat('mm').format(DateTime.now().difference(DateFormat('h:mm a').parse(alarmTime)).abs())} mins',
                     style: TextStyle(
                       color: Color(digitColor),
                       fontSize: 18,
@@ -200,9 +205,7 @@ class _ClockState extends State<Clock> {
                 DateFormat('h:').format(DateTime.now()),
                 style: TextStyle(
                   fontSize: 225,
-                  // PRIMARY COLOR 200 shade
                   color: Color(digitColor),
-                  // color: Theme.of(context).primaryColor,
                 ),
               ),
               Text(

@@ -1,5 +1,4 @@
 // Dependencies
-// import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -19,41 +18,12 @@ class Alarms extends StatefulWidget {
 }
 
 class AlarmsState extends State<Alarms> {
+  // Set the shared preferences
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  // List<String> alarmTimes = ['12:00', '13:00', '14:00'];
-
-  // void _loadAlarms() async {
-  //   print('Loading alarms $alarmTimes');
-  //   final SharedPreferences alarms = await _prefs;
-
-  //   print(alarms.getStringList('time'));
-  //   setState(() {
-  //     alarmTimes = alarms.getStringList('time') ?? [];
-  //     print('Loading alarms $alarmTimes');
-  //   });
-  // }
-
-  // Future<void> _addAlarm() async {
-  //   print('Add alarm pressed');
-
-  //   final SharedPreferences alarms = await _prefs;
-
-  //   // Save an list of strings to 'alarms' key.
-  //   await alarms.setStringList('time', <String>['10:00', '11:00', '12:00']);
-
-  //   print('Alarms: ${alarms.getStringList('time')}');
-
-  //   setState(() {
-  //     alarmTimes = alarms.getStringList('time')!;
-  //     print('Items: ${alarmTimes.toString()}');
-  //   });
-  // }
 
   @override
   void initState() {
     super.initState();
-    // _loadAlarms();
   }
 
   @override
@@ -63,6 +33,7 @@ class AlarmsState extends State<Alarms> {
 
     // Get the alarmTimes from applicationState
     List<String> alarmTimes = Provider.of<ApplicationState>(context).alarmTimes;
+    print('Alarms in alarms.dart: $alarmTimes');
 
     // Get setAlarmTime from ApplicationState
     var setAlarmTime = Provider.of<ApplicationState>(context).setAlarmTime;

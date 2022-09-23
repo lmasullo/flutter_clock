@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 // Dependencies:
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ class ApplicationState with ChangeNotifier {
   Future<void> init() async {
     final SharedPreferences alarms = await SharedPreferences.getInstance();
     _alarmTimes = alarms.getStringList('time') ?? [];
+    print('Alarms in App State: ${_alarmTimes.toString()}');
     notifyListeners();
   }
 
@@ -33,8 +35,10 @@ class ApplicationState with ChangeNotifier {
     notifyListeners();
   }
 
-  void setAlarmTimes(List<String> alarmTimes) {
-    _alarmTimes = alarmTimes;
+  void setAlarmTimes(List<String> newAlarmTimes) async {
+    final SharedPreferences alarms = await SharedPreferences.getInstance();
+    await alarms.setStringList('time', newAlarmTimes);
+    _alarmTimes = alarms.getStringList('time') ?? [];
     notifyListeners();
   }
 

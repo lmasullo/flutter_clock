@@ -6,9 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
 
-// Pages
-import '../pages/addAlarm.dart';
-
 // Widgets
 import '../widgets/alarms.dart';
 
@@ -20,17 +17,19 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  // Get setAlarmTime from ApplicationState
-  void setAlarmTime(BuildContext context, String? alarmTime) {
-    Provider.of<ApplicationState>(context, listen: false)
-        .setAlarmTime(alarmTime);
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Get setAlarmTime from ApplicationState
+    var setAlarmTime =
+        Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
+
     // Get the snoozeMinutes from the state
     int snoozeMinutes =
         Provider.of<ApplicationState>(context, listen: false).snoozeMinutes;
+
+    // Get the setSnoozeMinutes from ApplicationState
+    var setSnoozeMinutes =
+        Provider.of<ApplicationState>(context, listen: false).setSnoozeMinutes;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,26 +60,19 @@ class _SettingsState extends State<Settings> {
                   .snoozeMinutes
                   .toString(),
               onChanged: (double value) {
-                Provider.of<ApplicationState>(context, listen: false)
-                    .setSnoozeMinutes(value.toInt());
+                setSnoozeMinutes(value.toInt());
               },
             ),
 
             const SizedBox(height: 20),
 
+            // Widget to show alarms and add new alarms
             const Alarms(),
 
             // Button to setAlarmTime to now
             ElevatedButton(
               onPressed: () {
-                setAlarmTime(
-                    context, DateFormat('h:mm').format(DateTime.now()));
-
-                // Create a random string for the alarm id
-                // String idGenerator() {
-                //   final now = DateTime.now();
-                //   return now.microsecondsSinceEpoch.toString();
-                // }
+                setAlarmTime(DateFormat('h:mm a').format(DateTime.now()));
               },
               child: const Text('Now'),
             ),
