@@ -8,7 +8,7 @@ import '../state/applicationState.dart';
 
 // Pages
 import 'pages/settings.dart';
-import 'pages/test.dart';
+// import 'pages/test.dart';
 
 // Widgets
 import 'widgets/clock.dart';
@@ -105,7 +105,13 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: Color(0xFF9E9393),
+          ),
+        ),
+        backgroundColor: Colors.black,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -139,17 +145,15 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        // backgroundColor: Colors.red,
+        foregroundColor: Color(0xFF9E9393),
         onPressed: () {
           Navigator.push(
             context,
-            // MaterialPageRoute(builder: (context) => const Settings()),
-            MaterialPageRoute(
-                builder: (context) => const Test(
-                      title: 'test',
-                    )),
+            MaterialPageRoute(builder: (context) => const Settings()),
           );
         },
-        tooltip: 'Increment',
+        tooltip: 'Settings',
         child: const Icon(Icons.settings),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

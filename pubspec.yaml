@@ -43,7 +43,9 @@ dependencies:
   # device_display_brightness: ^0.0.6
   wakelock: ^0.6.2
   just_audio: ^0.9.27
-  localstorage: ^4.0.0+1
+  # localstorage: ^4.0.0+1
+  shared_preferences: ^2.0.15
+  toggle_switch: ^2.0.1
 
 dev_dependencies:
   flutter_test:

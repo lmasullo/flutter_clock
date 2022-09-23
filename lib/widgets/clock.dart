@@ -120,30 +120,49 @@ class _ClockState extends State<Clock> {
     // Get the snooze minutes from ApplicationState
     int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
 
+    // Set the color
     int digitColor = 0xFF594747;
 
+    // A stream that emits the current time every second
     return StreamBuilder(
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {
-        if (DateFormat('h:mm').format(DateTime.now()) == alarmTime) {
+        // If the current time is the same as the alarm time, play the alarm
+        if (DateFormat('h:mm a').format(DateTime.now()) == alarmTime) {
           playAlarm();
         }
 
         return Column(
           children: [
-            Text(
-              'alarmTime: $alarmTime',
-              style: const TextStyle(color: Colors.white),
-            ),
+            // If the alarm is on, show the alarm time and the snooze minutes
+            if (alarmTime != 'off') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.alarm, color: Color(digitColor)),
+                  Text(
+                    alarmTime!,
+                    style: TextStyle(
+                      color: Color(digitColor),
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Icon(Icons.snooze, color: Color(digitColor)),
+                  Text(
+                    '$snoozeMinutes mins',
+                    style: TextStyle(
+                      color: Color(digitColor),
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ],
 
-            // ElevatedButton(onPressed: reset, child: const Text('Reset')),
-            // if (showSnooze == false) ...[
-            //   ElevatedButton(onPressed: playAlarm, child: const Text('Play')),
-            // ],
-            Text(
-              'playOnce: $playOnce',
-              style: const TextStyle(color: Colors.white),
-            ),
+            // Show the snooze button
             if (showSnooze == true) ...[
               ElevatedButton(
                 onPressed: () => snoozeAlarm(snoozeMinutes),
@@ -180,7 +199,7 @@ class _ClockState extends State<Clock> {
               Text(
                 DateFormat('h:').format(DateTime.now()),
                 style: TextStyle(
-                  fontSize: 250,
+                  fontSize: 225,
                   // PRIMARY COLOR 200 shade
                   color: Color(digitColor),
                   // color: Theme.of(context).primaryColor,
@@ -189,7 +208,7 @@ class _ClockState extends State<Clock> {
               Text(
                 DateFormat('mm').format(DateTime.now()),
                 style: TextStyle(
-                  fontSize: 250,
+                  fontSize: 225,
                   color: Color(digitColor),
                 ),
               ),
