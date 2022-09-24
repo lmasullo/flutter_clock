@@ -119,6 +119,7 @@ class _ClockState extends State<Clock> {
 
     // Turn alarmTime into a time object
     var currDt = DateTime.now();
+    DateTime? parseDt;
     int snoozeLeft = 0;
     // print(currDt.year);
     // print(currDt.month);
@@ -142,9 +143,7 @@ class _ClockState extends State<Clock> {
 
       if (alarmParts[1] == 'PM') {
         alarmParts[0] =
-            (int.parse(alarmParts[0].split(":")[0]) + 12).toString() +
-                ":" +
-                alarmParts[0].split(":")[1];
+            "${int.parse(alarmParts[0].split(":")[0]) + 12}:${alarmParts[0].split(":")[1]}";
       }
 
       print(alarmParts[0]);
@@ -163,14 +162,14 @@ class _ClockState extends State<Clock> {
 
       String strDt =
           '${currDt.year}-$monthString-$dayString ${alarmParts[0]}:00';
-      DateTime parseDt = DateTime.parse(strDt);
+      parseDt = DateTime.parse(strDt);
 
       print('parseDt: $parseDt');
       print('currDt: $currDt');
 
       // Get the difference between the current time and the parseDt in minutes
-      snoozeLeft = parseDt.difference(currDt).inMinutes;
-      print('diff: $snoozeLeft');
+      // snoozeLeft = parseDt.difference(currDt).inMinutes;
+      // print('diff: $snoozeLeft');
     }
 
     // Get the snooze minutes from ApplicationState
@@ -216,7 +215,7 @@ class _ClockState extends State<Clock> {
                   ),
                   if (alarmTime != 'off') ...[
                     Text(
-                      ' - $snoozeLeft mins left',
+                      ' - ${parseDt!.difference(currDt).inMinutes} mins left',
                       style: TextStyle(
                         color: Color(digitColor),
                         fontSize: 18,
