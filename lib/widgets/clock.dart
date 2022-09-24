@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
 // State
-// import 'package:localstore/localstore.dart';
 import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
 
@@ -44,20 +43,27 @@ class _ClockState extends State<Clock> {
   }
 
   // Function to snooze the alarm
-  snoozeAlarm(snoozeMinutes) async {
+  snoozeAlarm() async {
     // Get the alarm time from the state
     String? alarmTime =
         Provider.of<ApplicationState>(context, listen: false).alarmTime;
 
+    print('Alarm time: $alarmTime');
+
     // Get setAlarmTime from ApplicationState
     var setAlarmTime =
         Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
+
+    // Get the snoozeMinutes from the state
+    int snoozeMinutes =
+        Provider.of<ApplicationState>(context, listen: false).snoozeMinutes;
 
     // Stop the alarm
     await player.stop();
 
     // Convert alarmTime to DateTime
     DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
+    print('Alarm time as DateTime: $alarmTimeAsDateTime');
 
     // Add the set snooze minutes to the alarm time
     setAlarmTime(DateFormat('h:mm a').format(
@@ -111,6 +117,62 @@ class _ClockState extends State<Clock> {
     // Get alarmTime from ApplicationState
     String? alarmTime = Provider.of<ApplicationState>(context).alarmTime;
 
+    // Turn alarmTime into a time object
+    var currDt = DateTime.now();
+    int snoozeLeft = 0;
+    // print(currDt.year);
+    // print(currDt.month);
+    // print(currDt.day);
+    print('alarmTime: $alarmTime');
+
+    if (alarmTime != 'off') {
+      // Convert alarmTime to DateTime
+      // DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
+      // print('alarmTimeAsDateTime: $alarmTimeAsDateTime');
+      // Cut off the first 10 characters
+      print('$alarmTime');
+      print(alarmTime!.length);
+      List<String> alarmParts = alarmTime.split(" ");
+      print('${alarmParts[0]} - ${alarmParts[1]}');
+
+      // Add a 0 to the hour if it's only 1 digit
+      if (alarmParts[0].length == 4) {
+        alarmParts[0] = '0${alarmParts[0]}';
+      }
+
+      if (alarmParts[1] == 'PM') {
+        alarmParts[0] =
+            (int.parse(alarmParts[0].split(":")[0]) + 12).toString() +
+                ":" +
+                alarmParts[0].split(":")[1];
+      }
+
+      print(alarmParts[0]);
+
+      // If currDt is single digit, add a 0 to the front
+      String monthString = currDt.month.toString();
+      if (monthString.length == 1) {
+        monthString = '0$monthString';
+      }
+
+      // If currDt.day is single digit, add a 0 to the front
+      String dayString = currDt.day.toString();
+      if (dayString.length == 1) {
+        dayString = '0$dayString';
+      }
+
+      String strDt =
+          '${currDt.year}-$monthString-$dayString ${alarmParts[0]}:00';
+      DateTime parseDt = DateTime.parse(strDt);
+
+      print('parseDt: $parseDt');
+      print('currDt: $currDt');
+
+      // Get the difference between the current time and the parseDt in minutes
+      snoozeLeft = parseDt.difference(currDt).inMinutes;
+      print('diff: $snoozeLeft');
+    }
+
     // Get the snooze minutes from ApplicationState
     int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
 
@@ -152,17 +214,15 @@ class _ClockState extends State<Clock> {
                       fontSize: 18,
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  // A text box that shows how many minutes left until the alarm goes off
-                  Text(
-                    '${DateFormat('mm').format(DateTime.now().difference(DateFormat('h:mm a').parse(alarmTime)).abs())} mins',
-                    style: TextStyle(
-                      color: Color(digitColor),
-                      fontSize: 18,
+                  if (alarmTime != 'off') ...[
+                    Text(
+                      ' - $snoozeLeft mins left',
+                      style: TextStyle(
+                        color: Color(digitColor),
+                        fontSize: 18,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ],
@@ -170,7 +230,7 @@ class _ClockState extends State<Clock> {
             // Show the snooze button
             if (showSnooze == true) ...[
               ElevatedButton(
-                onPressed: () => snoozeAlarm(snoozeMinutes),
+                onPressed: snoozeAlarm,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   minimumSize: const Size(300, 200),

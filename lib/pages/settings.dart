@@ -1,10 +1,12 @@
 // Dependencies
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 // State
 import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
+
+// Pages
+import '../pages/addAlarm.dart';
 
 // Widgets
 import '../widgets/alarms.dart';
@@ -19,10 +21,6 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    // Get setAlarmTime from ApplicationState
-    var setAlarmTime =
-        Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
-
     // Get the snoozeMinutes from the state
     int snoozeMinutes =
         Provider.of<ApplicationState>(context, listen: false).snoozeMinutes;
@@ -35,7 +33,7 @@ class _SettingsState extends State<Settings> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             const Padding(
@@ -68,16 +66,21 @@ class _SettingsState extends State<Settings> {
 
             // Widget to show alarms and add new alarms
             const Alarms(),
-
-            // Button to setAlarmTime to now
-            ElevatedButton(
-              onPressed: () {
-                setAlarmTime(DateFormat('h:mm a').format(DateTime.now()));
-              },
-              child: const Text('Now'),
-            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        foregroundColor: const Color(0xFF9E9393),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddAlarm(),
+            ),
+          );
+        },
+        tooltip: 'Settings',
+        child: const Icon(Icons.add),
       ),
     );
   }

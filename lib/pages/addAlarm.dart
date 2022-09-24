@@ -16,7 +16,7 @@ class AddAlarm extends StatefulWidget {
 
 class _AddAlarmState extends State<AddAlarm> {
   // Declare the selectedTime variable
-  TimeOfDay selectedTime = TimeOfDay(hour: 5, minute: 0);
+  TimeOfDay selectedTime = const TimeOfDay(hour: 5, minute: 0);
 
   // Declare a text controller.
   TextEditingController alarmController = TextEditingController(text: '');
@@ -55,7 +55,7 @@ class _AddAlarmState extends State<AddAlarm> {
     alarmController.text = '${selectedTime.hour}:$minutes';
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Alarm'),
+        title: const Text('Create an Alarm'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -100,18 +100,6 @@ class _AddAlarmState extends State<AddAlarm> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ElevatedButton(
-                  //   child: Text("Choose Time"),
-                  //   onPressed: () async {
-                  //     TimeOfDay? newTime = await showTimePicker(
-                  //         context: context, initialTime: selectedTime);
-
-                  //     // Set the selectedTime to the newTime
-                  //     setState(() {
-                  //       selectedTime = newTime!;
-                  //     });
-                  //   },
-                  // ),
                   // A button to add the alarm time
                   ElevatedButton(
                     onPressed: () => {
@@ -119,7 +107,7 @@ class _AddAlarmState extends State<AddAlarm> {
                       // Back
                       Navigator.pop(context),
                     },
-                    child: const Text('Add Alarm'),
+                    child: const Text('Save Alarm'),
                   ),
                 ],
               ),

@@ -13,7 +13,6 @@ import 'pages/settings.dart';
 import 'widgets/clock.dart';
 
 void main() {
-  // runApp(const MyApp());
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     // This is enables Provider State Management
