@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
 
 class AddAlarm extends StatefulWidget {
-  const AddAlarm({super.key});
+  const AddAlarm({super.key, this.alarm});
+
+  final String? alarm;
 
   @override
   State<AddAlarm> createState() => _AddAlarmState();
@@ -23,6 +25,9 @@ class _AddAlarmState extends State<AddAlarm> {
 
   // Function to save the alarm time
   saveAlarm(BuildContext context) async {
+    if (widget.alarm != null) {
+      deleteAlarm();
+    }
     // Get the alarmTimes from applicationState
     List<String> alarmTimes =
         Provider.of<ApplicationState>(context, listen: false).alarmTimes;
@@ -49,25 +54,74 @@ class _AddAlarmState extends State<AddAlarm> {
     setAlarmTimes(alarmTimes);
   }
 
+  // If editing alarm, delete 1st, then re-save
+  void deleteAlarm() async {
+    List<String> alarmTimes =
+        Provider.of<ApplicationState>(context, listen: false).alarmTimes;
+
+    // Get the setAlarmTimes from ApplicationState
+    var setAlarmTimes =
+        Provider.of<ApplicationState>(context, listen: false).setAlarmTimes;
+
+    alarmTimes.remove(widget.alarm);
+    setAlarmTimes(alarmTimes);
+  }
+
   @override
   Widget build(BuildContext context) {
     final minutes = selectedTime.minute.toString().padLeft(2, '0');
-    alarmController.text = '${selectedTime.hour}:$minutes';
+    alarmController.text = widget.alarm ?? '${selectedTime.hour}:$minutes';
+
+    if (widget.alarm != null) {
+      print('setting alarmController to ${widget.alarm}');
+
+      List<String> alarmParts = widget.alarm!.split(" ");
+
+      // Add a 0 to the hour if it's only 1 digit
+      if (alarmParts[0].length == 4) {
+        alarmParts[0] = '0${alarmParts[0]}';
+      }
+
+      if (alarmParts[1] == 'PM') {
+        alarmParts[0] =
+            "${int.parse(alarmParts[0].split(":")[0]) + 12}:${alarmParts[0].split(":")[1]}";
+      }
+
+      print('alarmParts[0] is ${alarmParts[0]}');
+      print('alarmParts[1] is ${alarmParts[1]}');
+
+      setState(() {
+        selectedTime = TimeOfDay(
+          hour: int.parse(alarmParts[0].split(":")[0]),
+          minute: int.parse(alarmParts[0].split(":")[1]),
+        );
+        print('selectedTime: $selectedTime');
+      });
+
+      // selectedTime = TimeOfDay.fromDateTime(DateTime.parse(widget.alarm!));
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create an Alarm'),
-      ),
+      appBar: AppBar(title: const Text('Add/Edit Alarm')),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             const SizedBox(height: 20),
-            const Text(
-              'Add an Alarm',
-              style: TextStyle(
-                fontSize: 24,
-              ),
-            ),
+
+            widget.alarm != null
+                ? const Text(
+                    'Edit Alarm',
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  )
+                : const Text(
+                    'Add an Alarm',
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
             const SizedBox(height: 20),
 
             // Form to add an alarm time

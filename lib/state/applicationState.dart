@@ -21,7 +21,6 @@ class ApplicationState with ChangeNotifier {
   Future<void> init() async {
     final SharedPreferences alarms = await SharedPreferences.getInstance();
     _alarmTimes = alarms.getStringList('time') ?? [];
-    print('Alarms in App State: ${_alarmTimes.toString()}');
     notifyListeners();
   }
 

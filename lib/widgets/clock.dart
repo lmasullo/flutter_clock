@@ -23,6 +23,7 @@ class _ClockState extends State<Clock> {
   // Set variables
   final player = AudioPlayer();
   bool showSnooze = false;
+  bool snoozeOn = false;
   bool playOnce = false;
 
   // Function to play alarm sound
@@ -48,8 +49,6 @@ class _ClockState extends State<Clock> {
     String? alarmTime =
         Provider.of<ApplicationState>(context, listen: false).alarmTime;
 
-    print('Alarm time: $alarmTime');
-
     // Get setAlarmTime from ApplicationState
     var setAlarmTime =
         Provider.of<ApplicationState>(context, listen: false).setAlarmTime;
@@ -62,8 +61,7 @@ class _ClockState extends State<Clock> {
     await player.stop();
 
     // Convert alarmTime to DateTime
-    DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
-    print('Alarm time as DateTime: $alarmTimeAsDateTime');
+    DateTime alarmTimeAsDateTime = DateFormat('h:mm a').parse(alarmTime!);
 
     // Add the set snooze minutes to the alarm time
     setAlarmTime(DateFormat('h:mm a').format(
@@ -75,6 +73,7 @@ class _ClockState extends State<Clock> {
     setState(() {
       // Set playOnce so the alarm doesn't play again
       playOnce = true;
+      snoozeOn = true;
     });
 
     // Delay for 1 second
@@ -100,6 +99,7 @@ class _ClockState extends State<Clock> {
 
       // Set playOnce so the alarm doesn't play again
       playOnce = true;
+      snoozeOn = false;
     });
     // Delay for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -117,24 +117,23 @@ class _ClockState extends State<Clock> {
     // Get alarmTime from ApplicationState
     String? alarmTime = Provider.of<ApplicationState>(context).alarmTime;
 
-    // Turn alarmTime into a time object
-    var currDt = DateTime.now();
-    DateTime? parseDt;
-    int snoozeLeft = 0;
-    // print(currDt.year);
-    // print(currDt.month);
-    // print(currDt.day);
-    print('alarmTime: $alarmTime');
+    // Get the snooze minutes from ApplicationState
+    int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
 
+    // Set the color
+    int digitColor = 0xFF594747;
+
+    // Get current time
+    DateTime currentDate = DateTime.now();
+
+    // Declare variables
+    DateTime? alarmDateParsed;
+    int snoozeLeft = 0;
+
+    // Alarm is 'On'
     if (alarmTime != 'off') {
-      // Convert alarmTime to DateTime
-      // DateTime alarmTimeAsDateTime = DateFormat('h:mm').parse(alarmTime!);
-      // print('alarmTimeAsDateTime: $alarmTimeAsDateTime');
-      // Cut off the first 10 characters
-      print('$alarmTime');
-      print(alarmTime!.length);
-      List<String> alarmParts = alarmTime.split(" ");
-      print('${alarmParts[0]} - ${alarmParts[1]}');
+      // Split the alarm time into hours and minutes
+      List<String> alarmParts = alarmTime!.split(" ");
 
       // Add a 0 to the hour if it's only 1 digit
       if (alarmParts[0].length == 4) {
@@ -146,37 +145,25 @@ class _ClockState extends State<Clock> {
             "${int.parse(alarmParts[0].split(":")[0]) + 12}:${alarmParts[0].split(":")[1]}";
       }
 
-      print(alarmParts[0]);
-
-      // If currDt is single digit, add a 0 to the front
-      String monthString = currDt.month.toString();
+      // If currentDate.month is single digit, add a 0 to the front
+      String monthString = currentDate.month.toString();
       if (monthString.length == 1) {
         monthString = '0$monthString';
       }
 
-      // If currDt.day is single digit, add a 0 to the front
-      String dayString = currDt.day.toString();
+      // If currentDate.day is single digit, add a 0 to the front
+      String dayString = currentDate.day.toString();
       if (dayString.length == 1) {
         dayString = '0$dayString';
       }
 
-      String strDt =
-          '${currDt.year}-$monthString-$dayString ${alarmParts[0]}:00';
-      parseDt = DateTime.parse(strDt);
+      // Turn the alarm time into a string with the current date attached
+      String alarmDateString =
+          '${currentDate.year}-$monthString-$dayString ${alarmParts[0]}:00';
 
-      print('parseDt: $parseDt');
-      print('currDt: $currDt');
-
-      // Get the difference between the current time and the parseDt in minutes
-      // snoozeLeft = parseDt.difference(currDt).inMinutes;
-      // print('diff: $snoozeLeft');
+      // Turn the alarm date string into a DateTime
+      alarmDateParsed = DateTime.parse(alarmDateString);
     }
-
-    // Get the snooze minutes from ApplicationState
-    int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
-
-    // Set the color
-    int digitColor = 0xFF594747;
 
     // A stream that emits the current time every second
     return StreamBuilder(
@@ -185,6 +172,12 @@ class _ClockState extends State<Clock> {
         // If the current time is the same as the alarm time, play the alarm
         if (DateFormat('h:mm a').format(DateTime.now()) == alarmTime) {
           playAlarm();
+        }
+
+        if (snoozeOn) {
+          // Get the difference between the current time and the parseDt in minutes
+          snoozeLeft =
+              (alarmDateParsed!.difference(DateTime.now()).inMinutes) + 1;
         }
 
         return Column(
@@ -213,9 +206,9 @@ class _ClockState extends State<Clock> {
                       fontSize: 18,
                     ),
                   ),
-                  if (alarmTime != 'off') ...[
+                  if (snoozeOn) ...[
                     Text(
-                      ' - ${parseDt!.difference(currDt).inMinutes} mins left',
+                      ' - $snoozeLeft mins left',
                       style: TextStyle(
                         color: Color(digitColor),
                         fontSize: 18,
@@ -263,14 +256,14 @@ class _ClockState extends State<Clock> {
               Text(
                 DateFormat('h:').format(DateTime.now()),
                 style: TextStyle(
-                  fontSize: 225,
+                  fontSize: 220,
                   color: Color(digitColor),
                 ),
               ),
               Text(
                 DateFormat('mm').format(DateTime.now()),
                 style: TextStyle(
-                  fontSize: 225,
+                  fontSize: 220,
                   color: Color(digitColor),
                 ),
               ),

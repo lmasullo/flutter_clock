@@ -7,6 +7,9 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
 
+// Pages
+import '../pages/addAlarm.dart';
+
 class Alarms extends StatefulWidget {
   const Alarms({Key? key}) : super(key: key);
 
@@ -30,15 +33,12 @@ class AlarmsState extends State<Alarms> {
 
     // Get the alarmTimes from applicationState
     List<String> alarmTimes = Provider.of<ApplicationState>(context).alarmTimes;
-    print('Alarms in alarms.dart: $alarmTimes');
 
     // Get setAlarmTime from ApplicationState
     var setAlarmTime = Provider.of<ApplicationState>(context).setAlarmTime;
 
     void deleteAlarm(String alarmTime) async {
-      print('Delete alarm pressed');
       final SharedPreferences alarms = await _prefs;
-      print('Alarm time: $alarmTime');
 
       alarmTimes.remove(alarmTime);
 
@@ -81,10 +81,8 @@ class AlarmsState extends State<Alarms> {
                 radiusStyle: true,
                 onToggle: (index) {
                   if (index == 0) {
-                    print('Switched to No');
                     setAlarmTime('off');
                   } else {
-                    print('Switched to Yes');
                     setAlarmTime(alarmTime);
                   }
                 },
@@ -95,6 +93,15 @@ class AlarmsState extends State<Alarms> {
                   deleteAlarm(alarmTimes[index]);
                 },
               ),
+              onTap:
+                  // Go to AddAlarm
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddAlarm(alarm: alarmTimes[index])),
+                );
+              },
             );
           },
         ),
