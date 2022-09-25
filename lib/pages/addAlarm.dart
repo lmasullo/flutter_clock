@@ -23,6 +23,9 @@ class _AddAlarmState extends State<AddAlarm> {
   // Declare a text controller.
   TextEditingController alarmController = TextEditingController(text: '');
 
+  // bool after alarm edited
+  bool alarmEdited = false;
+
   // Function to save the alarm time
   saveAlarm(BuildContext context) async {
     if (widget.alarm != null) {
@@ -63,42 +66,53 @@ class _AddAlarmState extends State<AddAlarm> {
     var setAlarmTimes =
         Provider.of<ApplicationState>(context, listen: false).setAlarmTimes;
 
+    // Remove the alarm from the list
     alarmTimes.remove(widget.alarm);
     setAlarmTimes(alarmTimes);
   }
 
+  void setEditTime() {
+    List<String> alarmParts = widget.alarm!.split(" ");
+
+    // Add a 0 to the hour if it's only 1 digit
+    if (alarmParts[0].length == 4) {
+      alarmParts[0] = '0${alarmParts[0]}';
+    }
+
+    // Add 12 if PM
+    if (alarmParts[1] == 'PM') {
+      alarmParts[0] =
+          "${int.parse(alarmParts[0].split(":")[0]) + 12}:${alarmParts[0].split(":")[1]}";
+    }
+
+    setState(() {
+      selectedTime = TimeOfDay(
+        hour: int.parse(alarmParts[0].split(":")[0]),
+        minute: int.parse(alarmParts[0].split(":")[1]),
+      );
+    });
+  }
+
+  // Run setEditTime when the widget is loaded
+  @override
+  void initState() {
+    // Set the selected time to the edited time on load
+    if (widget.alarm != null) {
+      setEditTime();
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Add 0 to minutes if it's only 1 digit
     final minutes = selectedTime.minute.toString().padLeft(2, '0');
-    alarmController.text = widget.alarm ?? '${selectedTime.hour}:$minutes';
 
-    if (widget.alarm != null) {
-      print('setting alarmController to ${widget.alarm}');
-
-      List<String> alarmParts = widget.alarm!.split(" ");
-
-      // Add a 0 to the hour if it's only 1 digit
-      if (alarmParts[0].length == 4) {
-        alarmParts[0] = '0${alarmParts[0]}';
-      }
-
-      if (alarmParts[1] == 'PM') {
-        alarmParts[0] =
-            "${int.parse(alarmParts[0].split(":")[0]) + 12}:${alarmParts[0].split(":")[1]}";
-      }
-
-      print('alarmParts[0] is ${alarmParts[0]}');
-      print('alarmParts[1] is ${alarmParts[1]}');
-
-      setState(() {
-        selectedTime = TimeOfDay(
-          hour: int.parse(alarmParts[0].split(":")[0]),
-          minute: int.parse(alarmParts[0].split(":")[1]),
-        );
-        print('selectedTime: $selectedTime');
-      });
-
-      // selectedTime = TimeOfDay.fromDateTime(DateTime.parse(widget.alarm!));
+    // Check if the alarm is being edited and put that in the text field
+    if (alarmEdited == false) {
+      alarmController.text = widget.alarm ?? '${selectedTime.hour}:$minutes';
+    } else {
+      alarmController.text = '${selectedTime.hour}:$minutes';
     }
 
     return Scaffold(
@@ -132,7 +146,7 @@ class _AddAlarmState extends State<AddAlarm> {
                   TextFormField(
                     controller: alarmController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter Alarm Time',
+                      hintText: 'Enter the Alarm Time',
                     ),
                     onTap: () async {
                       TimeOfDay? newTime = await showTimePicker(
@@ -143,6 +157,9 @@ class _AddAlarmState extends State<AddAlarm> {
                       // Set the selectedTime to the newTime
                       setState(() {
                         selectedTime = newTime!;
+                        if (widget.alarm != null) {
+                          alarmEdited = true;
+                        }
                       });
                     },
                     validator: (String? value) {
