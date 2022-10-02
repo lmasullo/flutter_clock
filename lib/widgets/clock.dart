@@ -120,9 +120,6 @@ class _ClockState extends State<Clock> {
     // Get the snooze minutes from ApplicationState
     int snoozeMinutes = Provider.of<ApplicationState>(context).snoozeMinutes;
 
-    // Set the color
-    int digitColor = 0xFF594747;
-
     // Get current time
     DateTime currentDate = DateTime.now();
 
@@ -187,22 +184,28 @@ class _ClockState extends State<Clock> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.alarm, color: Color(digitColor)),
+                  Icon(
+                    Icons.alarm,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   Text(
                     alarmTime!,
                     style: TextStyle(
-                      color: Color(digitColor),
+                      color: Theme.of(context).primaryColor,
                       fontSize: 18,
                     ),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  Icon(Icons.snooze, color: Color(digitColor)),
+                  Icon(
+                    Icons.snooze,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   Text(
                     '$snoozeMinutes mins',
                     style: TextStyle(
-                      color: Color(digitColor),
+                      color: Theme.of(context).primaryColor,
                       fontSize: 18,
                     ),
                   ),
@@ -210,7 +213,7 @@ class _ClockState extends State<Clock> {
                     Text(
                       ' - $snoozeLeft mins left',
                       style: TextStyle(
-                        color: Color(digitColor),
+                        color: Theme.of(context).primaryColor,
                         fontSize: 18,
                       ),
                     ),
@@ -257,21 +260,21 @@ class _ClockState extends State<Clock> {
                 DateFormat('h:').format(DateTime.now()),
                 style: TextStyle(
                   fontSize: 220,
-                  color: Color(digitColor),
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               Text(
                 DateFormat('mm').format(DateTime.now()),
                 style: TextStyle(
                   fontSize: 220,
-                  color: Color(digitColor),
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               Text(
                 DateFormat('a').format(DateTime.now()),
                 style: TextStyle(
                   fontSize: 50,
-                  color: Color(digitColor),
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               const SizedBox(
@@ -281,7 +284,7 @@ class _ClockState extends State<Clock> {
                 DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
                 style: TextStyle(
                   fontSize: 20,
-                  color: Color(digitColor),
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ],

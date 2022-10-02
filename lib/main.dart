@@ -1,6 +1,7 @@
 // Dependencies
 import 'package:flutter/material.dart';
-import 'package:wakelock/wakelock.dart';
+// import 'package:wakelock/wakelock.dart';
+import 'package:flutter_screen_wake/flutter_screen_wake.dart';
 
 // State
 import 'package:provider/provider.dart';
@@ -11,6 +12,7 @@ import 'pages/settings.dart';
 
 // Widgets
 import 'widgets/clock.dart';
+import 'widgets/brightness.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
       900: const Color(0xFF1A0E0E),
     };
 
-    const int clockPrimaryValue = 0xFF3C2727;
+    const int clockPrimaryValue = 0xFF271717;
 
     return MaterialApp(
       title: 'Snooze',
@@ -70,7 +72,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     // Keep the app awake
-    Wakelock.enable();
+    // Wakelock.enable();
+    // Prevent screen from going into sleep mode:
+    FlutterScreenWake.keepOn(true);
   }
 
   @override
@@ -81,22 +85,24 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(
           widget.title,
           style: const TextStyle(
-            color: Color(0xFF9E9393),
+            color: Color(0xFF3C2727),
           ),
         ),
         backgroundColor: Colors.black,
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
             // The clock widget
-            Clock()
+            Clock(),
+            // The brightness widget
+            Brightness(),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: const Color(0xFF9E9393),
+        foregroundColor: const Color(0xFF776868),
         onPressed: () {
           Navigator.push(
             context,
