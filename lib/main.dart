@@ -1,7 +1,7 @@
 // Dependencies
 import 'package:flutter/material.dart';
-// import 'package:wakelock/wakelock.dart';
-import 'package:flutter_screen_wake/flutter_screen_wake.dart';
+import 'package:flutter/services.dart';
+import 'package:wakelock/wakelock.dart';
 
 // State
 import 'package:provider/provider.dart';
@@ -16,6 +16,14 @@ import 'widgets/brightness.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+  //   SystemUiOverlay.bottom, //This line is used for showing the bottom bar
+  //   // SystemUiOverlay.top //This line is used for showing the top bar
+  // ]);
+
+  // Remove the status and bottom bars
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
   runApp(
     // This is enables Provider State Management
     ChangeNotifierProvider(
@@ -72,9 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     // Keep the app awake
-    // Wakelock.enable();
-    // Prevent screen from going into sleep mode:
-    FlutterScreenWake.keepOn(true);
+    Wakelock.enable();
+
+    // Remove the status and bottom bars
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+    //     overlays: [SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   }
 
   @override
@@ -90,16 +101,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         backgroundColor: Colors.black,
       ),
-      body: Center(
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            // The clock widget
-            Clock(),
-            // The brightness widget
-            Brightness(),
-          ],
-        ),
+      body: Column(
+        // mainAxisAlignment: MainAxisAlignment.c,
+        children: const <Widget>[
+          // The brightness widget
+          Brightness(),
+          // The clock widget
+          Clock(),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         foregroundColor: const Color(0xFF776868),
