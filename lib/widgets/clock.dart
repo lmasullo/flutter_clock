@@ -116,7 +116,7 @@ class _ClockState extends State<Clock> {
   Widget build(BuildContext context) {
     // Get the orientation
     Orientation orientation = MediaQuery.of(context).orientation;
-    print(orientation);
+    // print(orientation);
 
     // Get alarmTime from ApplicationState
     String? alarmTime = Provider.of<ApplicationState>(context).alarmTime;

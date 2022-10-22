@@ -46,14 +46,14 @@ class _BrightnessState extends State<Brightness> {
                 TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
           ),
           Slider(
-            value: brightness,
-            onChanged: (value) {
-              FlutterScreenWake.setBrightness(value);
-              setState(() {
-                brightness = value;
-              });
-            },
-          ),
+              value: brightness,
+              onChanged: (value) {
+                setState(() {
+                  brightness = value;
+                });
+                // FlutterScreenWake.setBrightness(brightness);
+                ScreenBrightness().setScreenBrightness(brightness);
+              }),
         ],
       ),
     );

@@ -34,11 +34,71 @@ class AlarmsState extends State<Alarms> {
     // Get the alarmTimes from applicationState
     List<String> alarmTimes = Provider.of<ApplicationState>(context).alarmTimes;
 
-    print('alarmTimes current ${alarmTimes}');
+    print('alarmTimes current $alarmTimes');
 
-    // Convert the array of alarmTimes to an array of DateTime objects
-    List<DateTime> times = alarmTimes.map((e) => DateTime.parse(e)).toList();
-    print('times current ${times}');
+    // Convert 4:06 PM to 24 time
+    String convertTime(String time) {
+      // Get the characters to the left of :
+      String hour = time.substring(0, time.indexOf(':'));
+      // String hour = time.substring(0, 2);
+      print('hour $hour');
+
+      // Get the 2 characters to the right of :
+      String minutes =
+          time.substring(time.indexOf(':') + 1, time.indexOf(':') + 3);
+
+      // String minute = time.substring(3, 5);
+      print('minutes $minutes');
+      // String amPm = time.substring(5, 7);
+      // print('amPm $amPm');
+
+      // Get the last 2 characters
+      String amPm = time.substring(time.length - 2);
+      print('amPm $amPm');
+
+      int hourInt = int.parse(hour);
+      int minuteInt = int.parse(minutes);
+
+      if (amPm == 'PM') {
+        hourInt += 12;
+      }
+
+      String hourString = hourInt.toString();
+      String minuteString = minuteInt.toString();
+
+      if (hourInt < 10) {
+        hourString = '0$hourString';
+      }
+
+      if (minuteInt < 10) {
+        minuteString = '0$minuteString';
+      }
+
+      // Get today's date
+      DateTime now = DateTime.now();
+      // Get just the first 10 characters
+      String date = now.toString().substring(0, 10);
+      // Get just the date from now
+      // DateTime date = DateTime(now.year, now.month, now.day);
+
+      print('$date $hourString:$minuteString');
+
+      return '$date $hourString:$minuteString';
+      // return '4:06 PM';
+    }
+
+    convertTime('1:06 AM');
+
+    // // Map over alarmTimes and change the time to a valid dateTime
+    // List<DateTime> alarmTimesDateTime = alarmTimes
+    //     .map((e) => DateTime.parse('2021-01-01 $e'))
+    //     .toList(growable: false);
+
+    // print('alarmTimesDateTime $alarmTimesDateTime');
+
+    // // Convert the array of alarmTimes to an array of DateTime objects
+    // List<DateTime> times = alarmTimes.map((e) => DateTime.parse(e)).toList();
+    // print('times current $times');
 
     // Get setAlarmTime from ApplicationState
     var setAlarmTime = Provider.of<ApplicationState>(context).setAlarmTime;
