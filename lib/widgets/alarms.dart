@@ -34,6 +34,12 @@ class AlarmsState extends State<Alarms> {
     // Get the alarmTimes from applicationState
     List<String> alarmTimes = Provider.of<ApplicationState>(context).alarmTimes;
 
+    print('alarmTimes current ${alarmTimes}');
+
+    // Convert the array of alarmTimes to an array of DateTime objects
+    List<DateTime> times = alarmTimes.map((e) => DateTime.parse(e)).toList();
+    print('times current ${times}');
+
     // Get setAlarmTime from ApplicationState
     var setAlarmTime = Provider.of<ApplicationState>(context).setAlarmTime;
 

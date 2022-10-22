@@ -228,38 +228,77 @@ class _ClockState extends State<Clock> {
 
             // Show the snooze button
             if (showSnooze == true) ...[
-              ElevatedButton(
-                onPressed: snoozeAlarm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(300, 200),
-                ),
-                child: const Text(
-                  'Snooze',
-                  style: TextStyle(
-                    fontSize: 50,
-                    color: Colors.white,
+              if (orientation == Orientation.portrait) ...[
+                ElevatedButton(
+                  onPressed: snoozeAlarm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    minimumSize: const Size(300, 200),
+                  ),
+                  child: const Text(
+                    'Snooze',
+                    style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 100,
-              ),
-              ElevatedButton(
-                onPressed: stopAlarm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  minimumSize: const Size(300, 200),
+                const SizedBox(
+                  height: 100,
                 ),
-                child: const Text(
-                  'Stop',
-                  style: TextStyle(
-                    fontSize: 50,
-                    color: Colors.white,
+                ElevatedButton(
+                  onPressed: stopAlarm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    minimumSize: const Size(300, 200),
+                  ),
+                  child: const Text(
+                    'Stop',
+                    style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              // End of if(showSnooze == true)
+                // End of if(showSnooze == true)
+              ] else ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: snoozeAlarm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size(300, 200),
+                      ),
+                      child: const Text(
+                        'Snooze',
+                        style: TextStyle(
+                          fontSize: 50,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 50,
+                    ),
+                    ElevatedButton(
+                      onPressed: stopAlarm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        minimumSize: const Size(300, 200),
+                      ),
+                      child: const Text(
+                        'Stop',
+                        style: TextStyle(
+                          fontSize: 50,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ]
             ] else ...[
               // Show the clock
               // First, check the orientation
