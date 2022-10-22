@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: const Color(0xFF776868),
+        foregroundColor: const Color(0xFF594747),
         onPressed: () {
           Navigator.push(
             context,
