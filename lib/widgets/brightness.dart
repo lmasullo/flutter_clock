@@ -10,7 +10,29 @@ class Brightness extends StatefulWidget {
 }
 
 class _BrightnessState extends State<Brightness> {
-  double brightness = 1.0;
+  double brightness = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    initBrightness();
+  }
+
+  Future<void> initBrightness() async {
+    double bright;
+
+    try {
+      bright = await FlutterScreenWake.brightness;
+    } catch (e) {
+      bright = 1.0;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      brightness = bright;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +49,10 @@ class _BrightnessState extends State<Brightness> {
           Slider(
             value: brightness,
             onChanged: (value) {
-              FlutterScreenWake.setBrightness(value);
               setState(() {
                 brightness = value;
               });
+              FlutterScreenWake.setBrightness(brightness);
             },
           ),
         ],
