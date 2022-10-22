@@ -40,7 +40,7 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.all(15.0),
               child: Text('Alarms', style: TextStyle(fontSize: 24)),
             ),
-            const Text('(version 1.5)', style: TextStyle(fontSize: 18)),
+            const Text('(version 1.11)', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
             Text(
               'Set Snooze Minutes: $snoozeMinutes',

@@ -1,6 +1,7 @@
 // Dependencies
 import 'package:flutter/material.dart';
-import 'package:flutter_screen_wake/flutter_screen_wake.dart';
+import 'package:flutter/services.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 
 class Brightness extends StatefulWidget {
   const Brightness({super.key});
@@ -10,25 +11,24 @@ class Brightness extends StatefulWidget {
 }
 
 class _BrightnessState extends State<Brightness> {
+  // Variables
   double brightness = 0.0;
 
   @override
   void initState() {
     super.initState();
-    initBrightness();
+    initPlatformBrightness();
   }
 
-  Future<void> initBrightness() async {
+  Future<void> initPlatformBrightness() async {
     double bright;
 
     try {
-      bright = await FlutterScreenWake.brightness;
-    } catch (e) {
+      bright = await ScreenBrightness().system;
+    } on PlatformException {
       bright = 1.0;
     }
-
     if (!mounted) return;
-
     setState(() {
       brightness = bright;
     });
@@ -37,22 +37,21 @@ class _BrightnessState extends State<Brightness> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(top: 8.0),
       child: Column(
         children: [
-          const SizedBox(height: 10),
-          Text('Adjust Brightness',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 20,
-              )),
+          Text(
+            'Adjust Brightness',
+            style:
+                TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
+          ),
           Slider(
             value: brightness,
             onChanged: (value) {
+              FlutterScreenWake.setBrightness(value);
               setState(() {
                 brightness = value;
               });
-              FlutterScreenWake.setBrightness(brightness);
             },
           ),
         ],

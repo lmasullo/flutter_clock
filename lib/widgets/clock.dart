@@ -114,6 +114,10 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the orientation
+    Orientation orientation = MediaQuery.of(context).orientation;
+    print(orientation);
+
     // Get alarmTime from ApplicationState
     String? alarmTime = Provider.of<ApplicationState>(context).alarmTime;
 
@@ -220,7 +224,7 @@ class _ClockState extends State<Clock> {
                   ],
                 ],
               ),
-            ],
+            ], //End of if(alarmTime != 'off') ...[
 
             // Show the snooze button
             if (showSnooze == true) ...[
@@ -255,38 +259,63 @@ class _ClockState extends State<Clock> {
                   ),
                 ),
               ),
+              // End of if(showSnooze == true)
             ] else ...[
-              Text(
-                DateFormat('h:').format(DateTime.now()),
-                style: TextStyle(
-                  fontSize: 220,
-                  color: Theme.of(context).primaryColor,
+              // Show the clock
+              // First, check the orientation
+              if (orientation == Orientation.portrait) ...[
+                Text(
+                  DateFormat('h:').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 200,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
-              ),
-              Text(
-                DateFormat('mm').format(DateTime.now()),
-                style: TextStyle(
-                  fontSize: 220,
-                  color: Theme.of(context).primaryColor,
+                Text(
+                  DateFormat('mm').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 200,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
-              ),
-              Text(
-                DateFormat('a').format(DateTime.now()),
-                style: TextStyle(
-                  fontSize: 50,
-                  color: Theme.of(context).primaryColor,
+                Text(
+                  DateFormat('a').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 50,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).primaryColor,
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
+                Text(
+                  DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+
+                // Orientation is Landscape
+              ] else ...[
+                Text(
+                  DateFormat('h:mm a').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 150,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ],
           ],
         );
