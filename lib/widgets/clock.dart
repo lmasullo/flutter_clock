@@ -7,6 +7,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../state/applicationState.dart';
 
+// Widgets
+import './weather.dart';
+
 class Clock extends StatefulWidget {
   const Clock({super.key});
 
@@ -317,12 +320,18 @@ class _ClockState extends State<Clock> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                Text(
-                  DateFormat('a').format(DateTime.now()),
-                  style: TextStyle(
-                    fontSize: 50,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      DateFormat('a').format(DateTime.now()),
+                      style: TextStyle(
+                        fontSize: 50,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    const Weather(),
+                  ],
                 ),
                 const SizedBox(
                   height: 20,
@@ -347,12 +356,21 @@ class _ClockState extends State<Clock> {
                 const SizedBox(
                   height: 20,
                 ),
-                Text(
-                  DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
-                  style: TextStyle(
-                    fontSize: 40,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 30.0),
+                      child: Weather(),
+                    ),
+                  ],
                 ),
               ],
             ],
