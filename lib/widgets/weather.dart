@@ -31,6 +31,7 @@ class _WeatherState extends State<Weather> {
     currentWeather = w.tempFeelsLike!.fahrenheit!.toInt().toString();
 
     setState(() {
+      currentWeather = currentWeather;
       count = 0;
     });
   }
