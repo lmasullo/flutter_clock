@@ -29,6 +29,13 @@ class _SettingsState extends State<Settings> {
     var setSnoozeMinutes =
         Provider.of<ApplicationState>(context, listen: false).setSnoozeMinutes;
 
+    final cityNameController = TextEditingController(
+        text: Provider.of<ApplicationState>(context).weatherCity;
+
+    // Get the setCityName from ApplicationState
+    var setCityName =
+        Provider.of<ApplicationState>(context, listen: false).setCityName;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -61,6 +68,27 @@ class _SettingsState extends State<Settings> {
               onChanged: (double value) {
                 setSnoozeMinutes(value.toInt());
               },
+            ),
+
+            const SizedBox(height: 20),
+
+            // A text field to set the city name
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: TextField(
+                controller: cityNameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'City Name',
+                ),
+              ),
+            ),
+
+            OutlinedButton(
+              onPressed: () {
+                setCityName(cityNameController.text);
+              },
+              child: const Text('Set City Name'),
             ),
 
             const SizedBox(height: 20),

@@ -25,6 +25,8 @@ class _WeatherState extends State<Weather> {
 
     var w = await wf.currentWeatherByCityName(cityName);
 
+    print('Weather: $w');
+
     // String cityName = 'Lampasas';
     // Weather w = (await wf.currentWeatherByCityName(cityName)) as Weather;
     print(w.tempFeelsLike!.fahrenheit!.toInt());

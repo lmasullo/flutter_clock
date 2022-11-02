@@ -17,15 +17,26 @@ class ApplicationState with ChangeNotifier {
   List<String> _alarmTimes = [];
   List<String> get alarmTimes => _alarmTimes;
 
+  String? _weatherCity = '';
+  String? get weatherCity => _weatherCity;
+
   // Function to load shared preferences 'time' key and set _alarmTimes
   Future<void> init() async {
     final SharedPreferences alarms = await SharedPreferences.getInstance();
     _alarmTimes = alarms.getStringList('time') ?? [];
+    _weatherCity = alarms.getString('weatherCity') ?? 'Lampasas';
+
+    // If there are no alarms set, set the default alarm time
     notifyListeners();
   }
 
   void setAlarmTime(String? alarmTime) {
     _alarmTime = alarmTime;
+    notifyListeners();
+  }
+
+  setCityName(String? weatherCity) {
+    _weatherCity = weatherCity;
     notifyListeners();
   }
 
