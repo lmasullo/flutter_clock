@@ -35,7 +35,10 @@ class ApplicationState with ChangeNotifier {
     notifyListeners();
   }
 
-  setCityName(String? weatherCity) {
+  setCityName(String? weatherCity) async {
+    final SharedPreferences setWeatherCity =
+        await SharedPreferences.getInstance();
+    await setWeatherCity.setString('weatherCity', weatherCity!);
     _weatherCity = weatherCity;
     notifyListeners();
   }

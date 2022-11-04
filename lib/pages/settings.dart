@@ -10,6 +10,7 @@ import '../pages/addAlarm.dart';
 
 // Widgets
 import '../widgets/alarms.dart';
+import '../widgets/cities.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -30,7 +31,7 @@ class _SettingsState extends State<Settings> {
         Provider.of<ApplicationState>(context, listen: false).setSnoozeMinutes;
 
     final cityNameController = TextEditingController(
-        text: Provider.of<ApplicationState>(context).weatherCity;
+        text: Provider.of<ApplicationState>(context).weatherCity);
 
     // Get the setCityName from ApplicationState
     var setCityName =
@@ -47,7 +48,7 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.all(15.0),
               child: Text('Alarms', style: TextStyle(fontSize: 24)),
             ),
-            const Text('(version 1.13)', style: TextStyle(fontSize: 18)),
+            const Text('(version 1.15)', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
             Text(
               'Set Snooze Minutes: $snoozeMinutes',
@@ -72,23 +73,49 @@ class _SettingsState extends State<Settings> {
 
             const SizedBox(height: 20),
 
-            // A text field to set the city name
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: TextField(
-                controller: cityNameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'City Name',
-                ),
-              ),
-            ),
+            Cities(),
 
-            OutlinedButton(
-              onPressed: () {
-                setCityName(cityNameController.text);
-              },
-              child: const Text('Set City Name'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // A text field to set the city name
+                  Expanded(
+                    child: TextField(
+                      controller: cityNameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Weather City Name',
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.orange,
+                      ),
+                      onPressed: () {
+                        setCityName(cityNameController.text);
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text(
+                            "City Name Saved!",
+                            style: TextStyle(fontSize: 20, color: Colors.black),
+                            textAlign: TextAlign.center,
+                          ),
+                          backgroundColor: Colors.orange,
+                          duration: Duration(milliseconds: 1500),
+                        ));
+                      },
+                      child: const Text('Set City Name'),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),

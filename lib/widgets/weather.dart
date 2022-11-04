@@ -2,6 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
 
+// State
+import 'package:provider/provider.dart';
+import '../state/applicationState.dart';
+
 class Weather extends StatefulWidget {
   const Weather({super.key});
 
@@ -14,13 +18,13 @@ class _WeatherState extends State<Weather> {
 
   int count = 0;
 
-  getWeather() async {
+  getWeather(cityName) async {
     print('Getting weather...');
     // WeatherFactory wf = WeatherFactory("237050c89d2935837b7f5dcb2f94d52b");
     // double lat = 55.0111;
     // double lon = 15.0569;
     String key = '237050c89d2935837b7f5dcb2f94d52b';
-    String cityName = 'Lampasas';
+    // String cityName = 'Lampasas';
     WeatherFactory wf = WeatherFactory(key);
 
     var w = await wf.currentWeatherByCityName(cityName);
@@ -41,11 +45,14 @@ class _WeatherState extends State<Weather> {
   @override
   void initState() {
     super.initState();
-    getWeather();
+    // getWeather('');
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get the weatherCity from the state
+    String? weatherCity = Provider.of<ApplicationState>(context).weatherCity;
+
     // A stream that emits the current time every second
     return StreamBuilder(
       stream: Stream.periodic(const Duration(minutes: 1)),
@@ -62,7 +69,7 @@ class _WeatherState extends State<Weather> {
         print('Count: $count');
 
         if (count == 2) {
-          getWeather();
+          getWeather(weatherCity);
         }
 
         // Return the time string
