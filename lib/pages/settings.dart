@@ -48,7 +48,7 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.all(15.0),
               child: Text('Alarms', style: TextStyle(fontSize: 24)),
             ),
-            const Text('(version 1.15)', style: TextStyle(fontSize: 18)),
+            const Text('(version 1.16)', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
             Text(
               'Set Snooze Minutes: $snoozeMinutes',
@@ -71,9 +71,9 @@ class _SettingsState extends State<Settings> {
               },
             ),
 
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
 
-            Cities(),
+            const Cities(),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -86,7 +86,8 @@ class _SettingsState extends State<Settings> {
                       controller: cityNameController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Weather City Name',
+                        labelText:
+                            'Weather City Name (can change the country code)',
                       ),
                     ),
                   ),
@@ -111,7 +112,7 @@ class _SettingsState extends State<Settings> {
                           duration: Duration(milliseconds: 1500),
                         ));
                       },
-                      child: const Text('Set City Name'),
+                      child: const Text('Save'),
                     ),
                   ),
                 ],
