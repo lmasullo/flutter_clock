@@ -1,5 +1,6 @@
 // Dependencies
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 // State
 import 'package:provider/provider.dart';
@@ -20,6 +21,31 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  // Set variables
+  final player = AudioPlayer();
+  bool playing = false;
+
+  // Function to play alarm sound
+  void playAlarm() async {
+    // Set the audio source
+    await player.setAsset('assets/sounds/thanksgiving.mp4');
+    // Play the audio source
+    await player.play();
+
+    // Wait 2 second, then stop the song
+    // await Future.delayed(const Duration(seconds: 2));
+    // Stop the alarm
+    //await player.stop();
+  }
+
+  // Function to stop the alarm
+  void stopAlarm() async {
+    // Set the audio source
+    await player.setAsset('assets/sounds/thanksgiving.mp4');
+    // Play the audio source
+    await player.stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get the snoozeMinutes from the state
@@ -48,7 +74,7 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.all(15.0),
               child: Text('Alarms', style: TextStyle(fontSize: 24)),
             ),
-            const Text('(version 1.16)', style: TextStyle(fontSize: 18)),
+            const Text('(version 1.17)', style: TextStyle(fontSize: 12)),
             const SizedBox(height: 20),
             Text(
               'Set Snooze Minutes: $snoozeMinutes',
@@ -117,6 +143,33 @@ class _SettingsState extends State<Settings> {
                   ),
                 ],
               ),
+            ),
+
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.orange,
+              ),
+              onPressed: () => setState(() {
+                // playing = true;
+                // playAlarm();
+
+                // If playing is true, then stop the alarm
+                if (playing) {
+                  playing = false;
+                  stopAlarm();
+                } else {
+                  playing = true;
+                  playAlarm();
+                }
+              }),
+
+              child:
+                  playing ? const Text('Stop Alarm') : const Text('Play Alarm'),
+              // Play the alarm song
+              // playAlarm();
+              // null,
+              // child: const Text('Play the Alarm Song'),
             ),
 
             const SizedBox(height: 20),
