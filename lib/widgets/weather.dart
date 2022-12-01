@@ -34,7 +34,10 @@ class _WeatherState extends State<Weather> {
     // String cityName = 'Lampasas';
     // Weather w = (await wf.currentWeatherByCityName(cityName)) as Weather;
     print(w.tempFeelsLike!.fahrenheit!.toInt());
-    currentWeather = w.tempFeelsLike!.fahrenheit!.toInt().toString();
+    print(w.tempMax!.fahrenheit!.toInt());
+
+    // currentWeather = w.tempFeelsLike!.fahrenheit!.toInt().toString();
+    currentWeather = w.tempMax!.fahrenheit!.toInt().toString();
 
     setState(() {
       currentWeather = currentWeather;
