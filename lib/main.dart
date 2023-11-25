@@ -101,9 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         backgroundColor: Colors.black,
       ),
-      body: Column(
+      body: const Column(
         // mainAxisAlignment: MainAxisAlignment.c,
-        children: const <Widget>[
+        children: <Widget>[
           // The brightness widget
           Brightness(),
           // The clock widget
