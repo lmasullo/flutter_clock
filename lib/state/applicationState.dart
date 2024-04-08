@@ -1,60 +1,84 @@
 // ignore_for_file: file_names
 // Dependencies:
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
 
-class ApplicationState with ChangeNotifier {
-  ApplicationState() {
-    init();
+// State
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+
+class ApplicationState extends StateNotifier<Map> {
+  ApplicationState() : super({});
+
+  // Initialize the local storage
+  final LocalStorage localStorage = LocalStorage('snooze');
+
+  // Function to set local storage using a future to eliminate file exception errors
+  Future<bool> setLocalItem(localVariable, value) async {
+    await localStorage.setItem(localVariable, value);
+    return true;
   }
 
-  String? _alarmTime = 'off';
-  String? get alarmTime => _alarmTime;
-
-  int _snoozeMinutes = 10;
-  int get snoozeMinutes => _snoozeMinutes;
-
-  List<String> _alarmTimes = [];
-  List<String> get alarmTimes => _alarmTimes;
-
-  String? _weatherCity = '';
-  String? get weatherCity => _weatherCity;
+  // Variables
+  String? alarmTime = 'Off';
+  int? snoozeMinutes = 10;
+  String? weatherCity;
+  List<String> alarmTimes = [];
 
   // Function to load shared preferences 'time' key and set _alarmTimes
-  Future<void> init() async {
-    final SharedPreferences alarms = await SharedPreferences.getInstance();
-    _alarmTimes = alarms.getStringList('time') ?? [];
-    _weatherCity = alarms.getString('weatherCity') ?? 'Lampasas';
+  // Future<void> init() async {
+  // final SharedPreferences alarms = await SharedPreferences.getInstance();
+  // _alarmTimes = alarms.getStringList('time') ?? [];
+  // _weatherCity = alarms.getString('weatherCity') ?? 'Lampasas';
 
-    // If there are no alarms set, set the default alarm time
-    notifyListeners();
+  // state = {
+  //   'alarmTime': _alarmTime,
+  //   'snoozeMinutes': _snoozeMinutes,
+  //   'alarmTimes': _alarmTimes,
+  //   'weatherCity': _weatherCity,
+  // };
+
+  // If there are no alarms set, set the default alarm time
+  // notifyListeners();
+  // }
+
+  void setAlarmTime(String? _alarmTime) async {
+    await setLocalItem('alarmTime', _alarmTime!);
+    alarmTime = _alarmTime;
+    state = {
+      'alarmTime': alarmTime,
+    };
   }
 
-  void setAlarmTime(String? alarmTime) {
-    _alarmTime = alarmTime;
-    notifyListeners();
+  setCityName(String? city) async {
+    await setLocalItem('weatherCity', city!);
+    weatherCity = city;
+
+    print('Setting weather city to $city in applicationState');
+
+    state = {
+      'weatherCity': city,
+    };
   }
 
-  setCityName(String? weatherCity) async {
-    final SharedPreferences setWeatherCity =
-        await SharedPreferences.getInstance();
-    await setWeatherCity.setString('weatherCity', weatherCity!);
-    _weatherCity = weatherCity;
-    notifyListeners();
+  void setSnoozeMinutes(int _snoozeMinutes) async {
+    // print('Setting snooze minutes to $_snoozeMinutes');
+    await setLocalItem('snoozeMinutes', _snoozeMinutes);
+    snoozeMinutes = _snoozeMinutes;
+    state = {
+      'snoozeMinutes': snoozeMinutes,
+    };
   }
 
-  void setSnoozeMinutes(int snoozeMinutes) {
-    _snoozeMinutes = snoozeMinutes;
-    notifyListeners();
+  void setAlarmTimes(List<dynamic> newAlarmTimes) async {
+    await setLocalItem('alarmTimes', newAlarmTimes);
+    state = {
+      'alarmTimes': newAlarmTimes,
+    };
+    // print('Setting alarm times to $newAlarmTimes');
   }
-
-  void setAlarmTimes(List<String> newAlarmTimes) async {
-    final SharedPreferences alarms = await SharedPreferences.getInstance();
-    await alarms.setStringList('time', newAlarmTimes);
-    _alarmTimes = alarms.getStringList('time') ?? [];
-    notifyListeners();
-  }
-
-  @override
-  notifyListeners();
 }
+
+final applicationState = StateNotifierProvider<ApplicationState, Map>((ref) {
+  return ApplicationState();
+});

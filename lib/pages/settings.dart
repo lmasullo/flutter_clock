@@ -1,29 +1,36 @@
 // Dependencies
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:localstorage/localstorage.dart';
 
 // State
-import 'package:provider/provider.dart';
-import '../state/applicationState.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_clock/state/applicationState.dart';
 
 // Pages
-import '../pages/addAlarm.dart';
+import 'package:flutter_clock/main.dart';
 
 // Widgets
-import '../widgets/alarms.dart';
-import '../widgets/cities.dart';
+import 'package:flutter_clock/widgets/alarms.dart';
+import 'package:flutter_clock/widgets/cities.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
 
   @override
-  State<Settings> createState() => _SettingsState();
+  ConsumerState<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends ConsumerState<Settings> {
   // Set variables
+  // Initialize the local storage
+  final LocalStorage localStorage = LocalStorage('snooze');
   final player = AudioPlayer();
   bool playing = false;
+  int? snoozeMinutes;
+  int? snoozeMinutesState;
+  String? weatherCity;
+  TextEditingController cityNameController = TextEditingController();
 
   // Function to play alarm sound
   void playAlarm() async {
@@ -31,11 +38,6 @@ class _SettingsState extends State<Settings> {
     await player.setAsset('assets/sounds/thanksgiving.mp4');
     // Play the audio source
     await player.play();
-
-    // Wait 2 second, then stop the song
-    // await Future.delayed(const Duration(seconds: 2));
-    // Stop the alarm
-    //await player.stop();
   }
 
   // Function to stop the alarm
@@ -46,60 +48,137 @@ class _SettingsState extends State<Settings> {
     await player.stop();
   }
 
+  // Define a function to update the data, comes from cities
+  void rebuild() {
+    // Updating the widget
+    print('Updating the widget with');
+    // setState(() {});
+    getWeatherLocal();
+  }
+
+  void getWeatherLocal() async {
+    String? weatherCityLocal = await localStorage.getItem('weatherCity');
+
+    setState(() {
+      print('set weather: $weatherCityLocal');
+      cityNameController = TextEditingController(
+        text: weatherCityLocal,
+      );
+    });
+  }
+
+  // Function to set local storage using a future to eliminate file exception errors
+  Future<bool> setLocalItem(localVariable, value) async {
+    await localStorage.setItem(localVariable, value);
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print('initState in settings');
+    getWeatherLocal();
+  }
+
+  setSnoozeMinutesLocal() async {
+    int? snoozeLocal = await localStorage.getItem('snoozeMinutes');
+
+    print('snoozeLocal: $snoozeLocal');
+
+    // Wait for the widget to load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        if (snoozeLocal == null) {
+          ref.read(applicationState.notifier).setSnoozeMinutes(9);
+        } else {
+          ref.read(applicationState.notifier).setSnoozeMinutes(snoozeLocal);
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get the snoozeMinutes from the state
-    int snoozeMinutes =
-        Provider.of<ApplicationState>(context, listen: false).snoozeMinutes;
+    print('building settings...');
 
-    // Get the setSnoozeMinutes from ApplicationState
-    var setSnoozeMinutes =
-        Provider.of<ApplicationState>(context, listen: false).setSnoozeMinutes;
-
-    final cityNameController = TextEditingController(
-        text: Provider.of<ApplicationState>(context).weatherCity);
-
-    // Get the setCityName from ApplicationState
-    var setCityName =
-        Provider.of<ApplicationState>(context, listen: false).setCityName;
+    snoozeMinutes = ref.watch(applicationState.notifier).snoozeMinutes;
+    if (snoozeMinutes == null) {
+      setSnoozeMinutesLocal();
+    }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title: const Text('Settings'),
+        leading: BackButton(
+            color: Theme.of(context).colorScheme.onPrimary,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const MyHomePage(
+                          title: 'Snooze',
+                        )),
+              );
+            }),
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 24,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Text('Alarms', style: TextStyle(fontSize: 24)),
+            // Text('alarmTime: $alarmTime'),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Text('Alarms',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  )),
             ),
-            const Text('(version 1.17)', style: TextStyle(fontSize: 12)),
+            Text('(version 1.18.0)',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onPrimary)),
             const SizedBox(height: 20),
             Text(
               'Set Snooze Minutes: $snoozeMinutes',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
 
             // A slider to set the snooze minutes
             Slider(
-              value: snoozeMinutes.toDouble(),
+              activeColor: Theme.of(context).colorScheme.secondary,
+              inactiveColor: Theme.of(context).colorScheme.surface,
+              thumbColor: Theme.of(context).colorScheme.onPrimary,
+              value: snoozeMinutes == null ? 1 : snoozeMinutes!.toDouble(),
               min: 1,
               max: 30,
               divisions: 29,
-              label: Provider.of<ApplicationState>(context)
-                  .snoozeMinutes
-                  .toString(),
-              onChanged: (double value) {
-                setSnoozeMinutes(value.toInt());
+              label: snoozeMinutes.toString(),
+              onChanged: (double value) async {
+                setState(() {
+                  ref
+                      .read(applicationState.notifier)
+                      .setSnoozeMinutes(value.toInt());
+                });
               },
             ),
 
-            // const SizedBox(height: 20),
+            Cities(onDataChange: rebuild),
 
-            const Cities(),
+            const SizedBox(
+              height: 20,
+            ),
+
+            const Text('Weather City Name (can change the country code)'),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -112,33 +191,8 @@ class _SettingsState extends State<Settings> {
                       controller: cityNameController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText:
-                            'Weather City Name (can change the country code)',
+                        labelText: 'Weather City Name',
                       ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.orange,
-                      ),
-                      onPressed: () {
-                        setCityName(cityNameController.text);
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text(
-                            "City Name Saved!",
-                            style: TextStyle(fontSize: 20, color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
-                          backgroundColor: Colors.orange,
-                          duration: Duration(milliseconds: 1500),
-                        ));
-                      },
-                      child: const Text('Save'),
                     ),
                   ),
                 ],
@@ -147,13 +201,10 @@ class _SettingsState extends State<Settings> {
 
             OutlinedButton(
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.orange,
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
               onPressed: () => setState(() {
-                // playing = true;
-                // playAlarm();
-
                 // If playing is true, then stop the alarm
                 if (playing) {
                   playing = false;
@@ -163,13 +214,8 @@ class _SettingsState extends State<Settings> {
                   playAlarm();
                 }
               }),
-
               child:
                   playing ? const Text('Stop Alarm') : const Text('Play Alarm'),
-              // Play the alarm song
-              // playAlarm();
-              // null,
-              // child: const Text('Play the Alarm Song'),
             ),
 
             const SizedBox(height: 20),
@@ -178,19 +224,6 @@ class _SettingsState extends State<Settings> {
             const Alarms(),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: const Color(0xFF9E9393),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddAlarm(),
-            ),
-          );
-        },
-        tooltip: 'Settings',
-        child: const Icon(Icons.add),
       ),
     );
   }

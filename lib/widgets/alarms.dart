@@ -1,40 +1,87 @@
 // Dependencies
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 // State
-import 'package:provider/provider.dart';
-import '../state/applicationState.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_clock/state/applicationState.dart';
 
 // Pages
-import '../pages/addAlarm.dart';
+import 'package:flutter_clock/pages/addAlarm.dart';
 
-class Alarms extends StatefulWidget {
-  const Alarms({Key? key}) : super(key: key);
+class Alarms extends ConsumerStatefulWidget {
+  const Alarms({super.key});
+
+  // final Function(String) onDataChange;
 
   @override
-  AlarmsState createState() => AlarmsState();
+  ConsumerState<Alarms> createState() => _AlarmsState();
 }
 
-class AlarmsState extends State<Alarms> {
-  // Set the shared preferences
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+class _AlarmsState extends ConsumerState<Alarms> {
+  // Variables
+  // Initialize the local storage
+  final LocalStorage localStorage = LocalStorage('snooze');
+  List<dynamic> alarmTimes = [];
+
+  // Function to set local storage using a future to eliminate file exception errors
+  Future<bool> setLocalItem(localVariable, value) async {
+    await localStorage.setItem(localVariable, value);
+    return true;
+  }
+
+  // Function to get local alarms on init state from local storage
+  getLocalAlarms() async {
+    List<dynamic>? alarmTimesLocal = await localStorage.getItem('alarmTimes');
+    if (alarmTimesLocal != null) {
+      setState(() {
+        // Get from state if not in local storage
+        ref.read(applicationState.notifier).setAlarmTimes(alarmTimesLocal);
+        alarmTimes = alarmTimesLocal;
+      });
+    }
+  }
+
+  void deleteAlarm(String alarmTime) async {
+    // Remove
+    alarmTimes.remove(alarmTime);
+    setState(() {
+      // Update state
+      ref.read(applicationState.notifier).setAlarmTimes(alarmTimes);
+      // Set local storage
+      setLocalItem('alarmTimes', alarmTimes);
+    });
+    // Show a snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Alarm Deleted!",
+          style: TextStyle(
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        duration: const Duration(milliseconds: 1500),
+      ),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    getLocalAlarms();
   }
 
   @override
   Widget build(BuildContext context) {
+    // print('building alarms...');
     // Get the alarmTime from ApplicationState
-    String? currentAlarm = Provider.of<ApplicationState>(context).alarmTime;
+    String? currentAlarm = ref.watch(applicationState.notifier).alarmTime;
 
-    // Get the alarmTimes from applicationState
-    List<String> alarmTimes = Provider.of<ApplicationState>(context).alarmTimes;
-
-// Convert 4:06 PM to 24 time
+    // Convert  to 24 time
     DateTime convertTime(String time) {
       // Get the characters to the left of :
       String hour = time.substring(0, time.indexOf(':'));
@@ -49,8 +96,6 @@ class AlarmsState extends State<Alarms> {
 
       int hourInt = int.parse(hour);
       int minuteInt = int.parse(minutes);
-      // print('hourInt $hourInt');
-      // print('minuteInt $minuteInt');
 
       if (amPm == 'PM') {
         hourInt += 12;
@@ -82,34 +127,41 @@ class AlarmsState extends State<Alarms> {
     // Sort the alarmTimes
     alarmTimes.sort((a, b) => convertTime(a).compareTo(convertTime(b)));
 
-    // Get setAlarmTime from ApplicationState
-    var setAlarmTime = Provider.of<ApplicationState>(context).setAlarmTime;
-
-    void deleteAlarm(String alarmTime) async {
-      final SharedPreferences alarms = await _prefs;
-
-      alarmTimes.remove(alarmTime);
-
-      await alarms.setStringList('time', alarmTimes);
-
-      setState(() {
-        alarmTimes = alarms.getStringList('time')!;
-      });
-    }
-
     return Column(
       children: [
+        FloatingActionButton(
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddAlarm(alarmTimes: alarmTimes),
+              ),
+            );
+          },
+          tooltip: 'Add an Alarm',
+          child: const Icon(Icons.add),
+        ),
+        if (alarmTimes.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(
+              child: Text('No Alarms Set'),
+            ),
+          ),
         ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: alarmTimes.length,
           itemBuilder: (BuildContext context, int index) {
             String? alarmTime = alarmTimes[index];
+
             return ListTile(
               title: Padding(
                 padding: const EdgeInsets.only(left: 50.0),
                 child: Text(
-                  alarmTime,
+                  alarmTime!,
                   style: const TextStyle(fontSize: 24),
                 ),
               ),
@@ -128,11 +180,16 @@ class AlarmsState extends State<Alarms> {
                 labels: const ['Off', 'On'],
                 radiusStyle: true,
                 onToggle: (index) {
-                  if (index == 0) {
-                    setAlarmTime('off');
-                  } else {
-                    setAlarmTime(alarmTime);
-                  }
+                  setState(() {
+                    if (index == 0) {
+                      ref.read(applicationState.notifier).setAlarmTime('Off');
+                      // widget.onDataChange('Update Settings!');
+                    } else {
+                      ref
+                          .read(applicationState.notifier)
+                          .setAlarmTime(alarmTime);
+                    }
+                  });
                 },
               ),
               trailing: IconButton(
@@ -141,13 +198,14 @@ class AlarmsState extends State<Alarms> {
                   deleteAlarm(alarmTimes[index]);
                 },
               ),
-              onTap:
-                  // Go to AddAlarm
-                  () {
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AddAlarm(alarm: alarmTimes[index])),
+                      builder: (context) => AddAlarm(
+                            alarmTimes: alarmTimes,
+                            alarm: alarmTime,
+                          )),
                 );
               },
             );

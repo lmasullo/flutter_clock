@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
-class Brightness extends StatefulWidget {
-  const Brightness({super.key});
+class BrightnessSlider extends StatefulWidget {
+  const BrightnessSlider({super.key});
 
   @override
-  State<Brightness> createState() => _BrightnessState();
+  State<BrightnessSlider> createState() => _BrightnessSliderState();
 }
 
-class _BrightnessState extends State<Brightness> {
+class _BrightnessSliderState extends State<BrightnessSlider> {
   // Variables
   double brightness = 0.0;
 
@@ -40,18 +40,15 @@ class _BrightnessState extends State<Brightness> {
       padding: const EdgeInsets.only(top: 8.0),
       child: Column(
         children: [
-          Text(
-            'Adjust Brightness',
-            style:
-                TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
-          ),
           Slider(
+              thumbColor: Theme.of(context).colorScheme.surface,
+              inactiveColor: Theme.of(context).colorScheme.surface,
+              activeColor: Theme.of(context).colorScheme.secondary,
               value: brightness,
               onChanged: (value) {
                 setState(() {
                   brightness = value;
                 });
-                // FlutterScreenWake.setBrightness(brightness);
                 ScreenBrightness().setScreenBrightness(brightness);
               }),
         ],

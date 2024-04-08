@@ -1,34 +1,42 @@
+// Dependencies
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-// import 'package:drop_down_list/drop_down_list.dart';
 import 'package:flutter/services.dart';
+import 'package:localstorage/localstorage.dart';
 
 // State
-import 'package:provider/provider.dart';
-import '../state/applicationState.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_clock/state/applicationState.dart';
 
-class Cities extends StatefulWidget {
-  const Cities({super.key});
+class Cities extends ConsumerStatefulWidget {
+  const Cities({super.key, required this.onDataChange});
+  final Function() onDataChange;
 
   @override
-  State<Cities> createState() => _CitiesState();
+  ConsumerState<Cities> createState() => _CitiesState();
 }
 
-class _CitiesState extends State<Cities> {
+class _CitiesState extends ConsumerState<Cities> {
+  // Variables
+  // Initialize the local storage
+  final LocalStorage localStorage = LocalStorage('snooze');
   List cityList = [];
 
   loadJson() async {
     // Getting Cities from assets/json/cities.json
-    print('Loading Cities');
     String data = await rootBundle.loadString('assets/cities.json');
     setState(() {
       cityList = json.decode(data);
-      print(cityList);
     });
   }
 
   List filteredList = [];
+
+  // Function to set local storage using a future to eliminate file exception errors
+  Future<bool> setLocalItem(localVariable, value) async {
+    await localStorage.setItem(localVariable, value);
+    return true;
+  }
 
   @override
   void initState() {
@@ -40,78 +48,8 @@ class _CitiesState extends State<Cities> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the setCityName from ApplicationState
-    var setCityName =
-        Provider.of<ApplicationState>(context, listen: false).setCityName;
-
-    var cityNameController = TextEditingController(text: '');
-
-    updateCityList(value) {
-      print('Updating City List $value');
-
-      setState(() {
-        // filteredList = cityList;
-        // cityNameController.text = value;
-        filteredList = cityList.where((city) {
-          return city['city'].startsWith(value);
-        }).toList();
-      });
-      print('filtered Cities: $filteredList');
-      // cityNameController.text = value;
-    }
-
     return Column(
       children: [
-        // Container(
-        //   padding: EdgeInsets.all(10),
-        //   child: DropdownButton(
-        //     hint: Text('Select City'),
-        //     isExpanded: true,
-        //     iconSize: 30.0,
-        //     style: TextStyle(color: Colors.black),
-        //     items: cityList.map((city) {
-        //       return DropdownMenuItem(
-        //         child: Text(city['city']),
-        //         value: city['city'],
-        //       );
-        //     }).toList(),
-        //     onChanged: (value) {
-        //       setState(() {
-        //         setCityName(value as String);
-        //       });
-        //     },
-        //   ),
-        // ),
-
-        // Autocomplete the city name from the list of cities when typing
-        // Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: TextField(
-        //     controller: cityNameController,
-        //     decoration: const InputDecoration(
-        //       labelText: 'City Name Test',
-        //       hintText: 'Enter City Name',
-        //     ),
-        //     onChanged: (value) {
-        //       // setCityName(value);
-        //       // Filter the list of cities that start with the letters typed
-        //       // setState(() {
-        //       // filteredList = [];
-        //       // filteredList = cityList.where((city) {
-        //       //   return city['city'].startsWith(value);
-        //       // }).toList();
-        //       // });
-
-        //       updateCityList(value);
-
-        //       // print(filteredList);
-        //     },
-        //   ),
-        // ),
-
-        // SizedBox(height: 20),
-        // Text('Filtered Cities'),
-
         Padding(
           padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: InputDecorator(
@@ -130,7 +68,6 @@ class _CitiesState extends State<Cities> {
                   }));
 
                   matches.retainWhere((s) {
-                    // print(s);
                     return s
                         .toLowerCase()
                         .startsWith(textEditingValue.text.toLowerCase());
@@ -138,20 +75,49 @@ class _CitiesState extends State<Cities> {
                   return matches;
                 }
               },
-              onSelected: (String selection) {
-                print('You just selected $selection');
+              fieldViewBuilder: (BuildContext context,
+                  TextEditingController textEditingController,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted) {
+                return TextField(
+                  controller: textEditingController,
+                  focusNode: focusNode,
+                  cursorColor: Theme.of(context).colorScheme.surface,
+                );
+              },
+              onSelected: (String selection) async {
                 // Get the city name from the selection, just the characters to the left of the comma
                 String cityName = selection.split(',')[0];
-                setCityName('$cityName, US');
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text(
-                    "City Name Saved!",
-                    style: TextStyle(fontSize: 20, color: Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
-                  backgroundColor: Colors.orange,
-                  duration: Duration(milliseconds: 1500),
-                ));
+                print('City Name: $cityName');
+
+                // Save to local storage
+                setLocalItem('city', cityName);
+
+                // Save to state
+                ref.read(applicationState.notifier).setCityName(cityName);
+
+                // Pause 1 second
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  print('cityName in cities: $cityName');
+                  // Call the callback to update the data in the parent
+                  print('calling onDataChange');
+                  widget.onDataChange();
+                });
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                      "City Name Saved!",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                    duration: const Duration(milliseconds: 1500),
+                  ));
+                }
               },
             ),
           ),

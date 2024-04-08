@@ -1,89 +1,73 @@
 // Dependencies
 import 'package:flutter/material.dart';
 import 'package:weather/weather.dart';
+import 'package:localstorage/localstorage.dart';
 
 // State
-import 'package:provider/provider.dart';
-import '../state/applicationState.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Weather extends StatefulWidget {
-  const Weather({super.key});
+class Weather extends ConsumerStatefulWidget {
+  const Weather({super.key, required this.rebuild});
+
+  final bool rebuild;
 
   @override
-  State<Weather> createState() => _WeatherState();
+  ConsumerState<Weather> createState() => _WeatherState();
 }
 
-class _WeatherState extends State<Weather> {
+class _WeatherState extends ConsumerState<Weather> {
+  // Variables
+  // Initialize the local storage
+  final LocalStorage localStorage = LocalStorage('snooze');
   String currentWeather = 'Loading...';
+  String? weatherCity;
 
-  int count = 0;
-
-  getWeather(cityName) async {
+  getWeather() async {
     print('Getting weather...');
-    // WeatherFactory wf = WeatherFactory("237050c89d2935837b7f5dcb2f94d52b");
-    // double lat = 55.0111;
-    // double lon = 15.0569;
-    String key = '237050c89d2935837b7f5dcb2f94d52b';
-    // String cityName = 'Lampasas';
-    WeatherFactory wf = WeatherFactory(key);
 
-    var w = await wf.currentWeatherByCityName(cityName);
+    // Pause 1 second
+    Future.delayed(const Duration(milliseconds: 250), () async {
+      weatherCity = await localStorage.getItem('city');
+      print('weatherCityLocal in weather: $weatherCity');
 
-    print('Weather: $w');
+      String key = '237050c89d2935837b7f5dcb2f94d52b';
+      // String cityName = 'Lampasas';
+      WeatherFactory wf = WeatherFactory(key);
 
-    // String cityName = 'Lampasas';
-    // Weather w = (await wf.currentWeatherByCityName(cityName)) as Weather;
-    print(w.tempFeelsLike!.fahrenheit!.toInt());
-    print(w.tempMax!.fahrenheit!.toInt());
+      var w = await wf.currentWeatherByCityName(weatherCity!);
 
-    // currentWeather = w.tempFeelsLike!.fahrenheit!.toInt().toString();
-    currentWeather = w.tempMax!.fahrenheit!.toInt().toString();
-
-    setState(() {
-      currentWeather = currentWeather;
-      count = 0;
+      String currentWeatherTemp = w.tempMax!.fahrenheit!.toInt().toString();
+      print('Current Weather: $currentWeatherTemp');
+      if (currentWeatherTemp != currentWeather &&
+          currentWeatherTemp != 'Loading...') {
+        print('Setting current weather...');
+        setState(() {
+          currentWeather = currentWeatherTemp;
+        });
+      }
     });
   }
 
   @override
   void initState() {
     super.initState();
-    // getWeather('');
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get the weatherCity from the state
-    String? weatherCity = Provider.of<ApplicationState>(context).weatherCity;
+    print('Building weather...');
 
-    // A stream that emits the current time every second
-    return StreamBuilder(
-      stream: Stream.periodic(const Duration(minutes: 1)),
-      builder: (context, snapshot) {
-        // Get the current time
-        // final time = DateTime.now();
+    if (widget.rebuild) {
+      getWeather();
+    }
 
-        // // Get the current time in a string
-        // final timeString =
-        //     '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-
-        // increment the count
-        count++;
-        print('Count: $count');
-
-        if (count == 2) {
-          getWeather(weatherCity);
-        }
-
-        // Return the time string
-        return Text(
-          '$currentWeather\u2109',
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 50,
-          ),
-        );
-      },
+    // Return the time string
+    return Text(
+      '$currentWeather\u2109',
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.surface,
+        fontSize: 40,
+      ),
     );
   }
 }

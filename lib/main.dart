@@ -4,31 +4,24 @@ import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 
 // State
-import 'package:provider/provider.dart';
-import '../state/applicationState.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Pages
 import 'pages/settings.dart';
 
 // Widgets
 import 'widgets/clock.dart';
-import 'widgets/brightness.dart';
+import 'widgets/brightnessSlider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-  //   SystemUiOverlay.bottom, //This line is used for showing the bottom bar
-  //   // SystemUiOverlay.top //This line is used for showing the top bar
-  // ]);
 
   // Remove the status and bottom bars
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   runApp(
-    // This is enables Provider State Management
-    ChangeNotifierProvider(
-        create: (context) => ApplicationState(),
-        builder: (context, _) => const MyApp()),
+    // This is enables Riverpod State Management
+    const ProviderScope(child: MyApp()),
   );
 }
 
@@ -38,43 +31,45 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Map<int, Color> color1 = {
-      50: const Color(0xFFE8E5E5),
-      100: const Color(0xFFC5BEBE),
-      200: const Color(0xFF9E9393),
-      300: const Color(0xFF776868),
-      400: const Color(0xFF594747),
-      500: const Color(0xFF3C2727),
-      600: const Color(0xFF362323),
-      700: const Color(0xFF2E1D1D),
-      800: const Color(0xFF271717),
-      900: const Color(0xFF1A0E0E),
-    };
-
-    const int clockPrimaryValue = 0xFF271717;
-
     return MaterialApp(
       title: 'Snooze',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        primarySwatch: MaterialColor(clockPrimaryValue, color1),
+        useMaterial3: true,
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Colors.black,
+          onPrimary: Colors.white,
+          secondary: Colors.grey,
+          onSecondary: Colors.green,
+          surface: Colors.red,
+          onSurface: Colors.white,
+          error: Colors.red,
+          onError: Colors.white,
+        ),
       ),
       home: const MyHomePage(title: 'Snooze'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   // Variable fort the title of the app
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
+  // Variables
+  // void rebuild() {
+  //   print('rebuilding on Main');
+  //   setState(() {});
+  // }
+
   @override
   void initState() {
     super.initState();
@@ -83,36 +78,35 @@ class _MyHomePageState extends State<MyHomePage> {
     Wakelock.enable();
 
     // Remove the status and bottom bars
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-    //     overlays: [SystemUiOverlay.bottom]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
         title: Text(
           widget.title,
-          style: const TextStyle(
-            color: Color(0xFF3C2727),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.surface,
           ),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      body: const Column(
-        // mainAxisAlignment: MainAxisAlignment.c,
-        children: <Widget>[
-          // The brightness widget
-          Brightness(),
-          // The clock widget
-          Clock(),
-        ],
+      body: const SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            // The brightness widget
+            BrightnessSlider(),
+            // The clock widget
+            Clock(),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: const Color(0xFF594747),
-        backgroundColor: const Color(0xFF362323),
+        foregroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         onPressed: () {
           Navigator.push(
             context,
