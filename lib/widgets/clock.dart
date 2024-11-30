@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:localstorage/localstorage.dart';
@@ -12,6 +13,9 @@ import 'package:flutter_clock/state/applicationState.dart';
 
 // Widgets
 import 'package:flutter_clock/widgets/weather.dart';
+
+// Pages
+import 'package:flutter_clock/widgets/time.dart';
 
 class Clock extends ConsumerStatefulWidget {
   const Clock({super.key});
@@ -30,9 +34,6 @@ class _ClockState extends ConsumerState<Clock> {
   int? snoozeMinutes;
   DateTime? currentTime;
   String? currentTimeString;
-
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
 
   convertAlarmTime(alarm) {
     // Get the last 2 characters (AM or PM) and strip them off
@@ -453,22 +454,22 @@ class _ClockState extends ConsumerState<Clock> {
               // mainAxisSize: MainAxisSize.min,
               children: [
                 // If the alarm is on, show the alarm time and the snooze minutes
-                Text('showSnooze: $showSnooze'),
+                // Text('showSnooze: $showSnooze'),
                 // Button to start the alarm
-                ElevatedButton(
-                  onPressed: () {
-                    playAlarm();
-                  },
-                  child: Text('Start Alarm'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     playAlarm();
+                //   },
+                //   child: Text('Start Alarm'),
+                // ),
 
                 // Button to stop the alarm
-                ElevatedButton(
-                  onPressed: () {
-                    stopAlarm();
-                  },
-                  child: Text('Stop Alarm'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     stopAlarm();
+                //   },
+                //   child: Text('Stop Alarm'),
+                // ),
                 if (alarmTime != 'off') ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -609,6 +610,16 @@ class _ClockState extends ConsumerState<Clock> {
                   // No Snooze
                   // First, check the orientation
                   // !Portrait
+                  // button to test page
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => const Test()),
+                  //     );
+                  //   },
+                  //   child: Text('Test Page'),
+                  // ),
                   if (orientation == Orientation.portrait) ...[
                     Text(
                       DateFormat('h:').format(DateTime.now()),
@@ -641,9 +652,9 @@ class _ClockState extends ConsumerState<Clock> {
                     ),
 
                     // !Weather widget
-                    const Weather(
-                      rebuild: true,
-                    ),
+                    // const Weather(
+                    //   rebuild: true,
+                    // ),
 
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -656,7 +667,7 @@ class _ClockState extends ConsumerState<Clock> {
                       ),
                     ),
 
-                    // Orientation is Landscape
+                    //! Orientation is Landscape
                   ] else ...[
                     Text(
                       DateFormat('h:mm a').format(DateTime.now()),

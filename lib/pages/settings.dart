@@ -24,7 +24,7 @@ class Settings extends ConsumerStatefulWidget {
 class _SettingsState extends ConsumerState<Settings> {
   // Set variables
   // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
+  // final LocalStorage localStorage = LocalStorage('snooze');
   final player = AudioPlayer();
   bool playing = false;
   int? snoozeMinutes;
@@ -57,7 +57,7 @@ class _SettingsState extends ConsumerState<Settings> {
   }
 
   void getWeatherLocal() async {
-    String? weatherCityLocal = await localStorage.getItem('weatherCity');
+    String? weatherCityLocal = localStorage.getItem('weatherCity');
 
     setState(() {
       print('set weather: $weatherCityLocal');
@@ -69,7 +69,7 @@ class _SettingsState extends ConsumerState<Settings> {
 
   // Function to set local storage using a future to eliminate file exception errors
   Future<bool> setLocalItem(localVariable, value) async {
-    await localStorage.setItem(localVariable, value);
+    localStorage.setItem(localVariable, value);
     return true;
   }
 
@@ -81,7 +81,7 @@ class _SettingsState extends ConsumerState<Settings> {
   }
 
   setSnoozeMinutesLocal() async {
-    int? snoozeLocal = await localStorage.getItem('snoozeMinutes');
+    int? snoozeLocal = localStorage.getItem('snoozeMinutes') as int?;
 
     print('snoozeLocal: $snoozeLocal');
 

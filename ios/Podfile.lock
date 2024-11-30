@@ -35,13 +35,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wakelock/ios"
 
 SPEC CHECKSUMS:
-  audio_session: 4f3e461722055d21515cf3261b64c973c062f345
+  audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   screen_brightness_ios: 7437207a2a9bc56553aa10f782afecf830b4c4e2
   wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
 
 PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
 
-COCOAPODS: 1.15.1
+COCOAPODS: 1.16.2

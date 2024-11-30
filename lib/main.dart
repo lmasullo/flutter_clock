@@ -1,20 +1,28 @@
 // Dependencies
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:localstorage/localstorage.dart';
 
 // State
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Pages
-import 'pages/settings.dart';
+import 'package:flutter_clock/pages/settings.dart';
+
+// Widgets
+import 'package:flutter_clock/widgets/weather.dart';
 
 // Widgets
 import 'widgets/clock.dart';
 import 'widgets/brightnessSlider.dart';
+import 'package:flutter_clock/widgets/time.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initLocalStorage();
 
   // Remove the status and bottom bars
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -93,14 +101,36 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        // No back button
+        automaticallyImplyLeading: false,
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             // The brightness widget
             BrightnessSlider(),
             // The clock widget
-            Clock(),
+            Time(),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(
+                child: Text(
+                  DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 30.0),
+              child:
+                  // !Weather widget
+                  Weather(
+                rebuild: true,
+              ),
+            ),
           ],
         ),
       ),

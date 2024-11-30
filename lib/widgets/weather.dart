@@ -17,17 +17,20 @@ class Weather extends ConsumerStatefulWidget {
 
 class _WeatherState extends ConsumerState<Weather> {
   // Variables
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
   String currentWeather = 'Loading...';
-  String? weatherCity;
+  String weatherCity = 'Lampasas';
 
   getWeather() async {
     print('Getting weather...');
 
     // Pause 1 second
     Future.delayed(const Duration(milliseconds: 250), () async {
-      weatherCity = await localStorage.getItem('city');
+      String? getWeatherCity = localStorage.getItem('city');
+
+      if (getWeatherCity != null) {
+        weatherCity = getWeatherCity;
+      }
+
       print('weatherCityLocal in weather: $weatherCity');
 
       String key = '237050c89d2935837b7f5dcb2f94d52b';
@@ -62,11 +65,13 @@ class _WeatherState extends ConsumerState<Weather> {
     }
 
     // Return the time string
-    return Text(
-      '$currentWeather\u2109',
-      style: TextStyle(
-        color: Theme.of(context).colorScheme.surface,
-        fontSize: 40,
+    return Center(
+      child: Text(
+        '$weatherCity - $currentWeather\u2109',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.surface,
+          fontSize: 20,
+        ),
       ),
     );
   }

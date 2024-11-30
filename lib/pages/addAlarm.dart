@@ -22,8 +22,6 @@ class AddAlarm extends ConsumerStatefulWidget {
 
 class _AddAlarmState extends ConsumerState<AddAlarm> {
   // Variables
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
 
   TimeOfDay selectedTime = const TimeOfDay(hour: 5, minute: 0);
 
@@ -35,7 +33,7 @@ class _AddAlarmState extends ConsumerState<AddAlarm> {
 
   // Function to set local storage using a future to eliminate file exception errors
   Future<bool> setLocalItem(localVariable, value) async {
-    await localStorage.setItem(localVariable, value);
+    localStorage.setItem(localVariable, value);
     return true;
   }
 

@@ -18,8 +18,6 @@ class Cities extends ConsumerStatefulWidget {
 
 class _CitiesState extends ConsumerState<Cities> {
   // Variables
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
   List cityList = [];
 
   loadJson() async {
@@ -34,7 +32,7 @@ class _CitiesState extends ConsumerState<Cities> {
 
   // Function to set local storage using a future to eliminate file exception errors
   Future<bool> setLocalItem(localVariable, value) async {
-    await localStorage.setItem(localVariable, value);
+    localStorage.setItem(localVariable, value);
     return true;
   }
 

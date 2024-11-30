@@ -10,12 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ApplicationState extends StateNotifier<Map> {
   ApplicationState() : super({});
 
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
-
   // Function to set local storage using a future to eliminate file exception errors
   Future<bool> setLocalItem(localVariable, value) async {
-    await localStorage.setItem(localVariable, value);
+    localStorage.setItem(localVariable, value);
     return true;
   }
 

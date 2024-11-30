@@ -21,19 +21,18 @@ class Alarms extends ConsumerStatefulWidget {
 
 class _AlarmsState extends ConsumerState<Alarms> {
   // Variables
-  // Initialize the local storage
-  final LocalStorage localStorage = LocalStorage('snooze');
   List<dynamic> alarmTimes = [];
 
   // Function to set local storage using a future to eliminate file exception errors
   Future<bool> setLocalItem(localVariable, value) async {
-    await localStorage.setItem(localVariable, value);
+    localStorage.setItem(localVariable, value);
     return true;
   }
 
   // Function to get local alarms on init state from local storage
   getLocalAlarms() async {
-    List<dynamic>? alarmTimesLocal = await localStorage.getItem('alarmTimes');
+    List<dynamic>? alarmTimesLocal =
+        localStorage.getItem('alarmTimes') as List?;
     if (alarmTimesLocal != null) {
       setState(() {
         // Get from state if not in local storage

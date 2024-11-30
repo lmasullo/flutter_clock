@@ -49,7 +49,7 @@ class _BrightnessSliderState extends State<BrightnessSlider> {
                 setState(() {
                   brightness = value;
                 });
-                ScreenBrightness().setScreenBrightness(brightness);
+                ScreenBrightness().setApplicationScreenBrightness(brightness);
               }),
         ],
       ),
